@@ -1,0 +1,125 @@
+{
+    "scope": {
+	"owon": {
+	    "resource_address": "USB0::0x5345::0x1235::2052231::INSTR",
+	    "channels": {
+		"H": 1,
+		"V": 2,
+		"+": 3,
+		"-": 4
+	    },
+	    "wave": {
+		"amplitude": 0.05,
+		"frequency": 100,
+		"nduty1": 0.2,
+		"nduty2": 0.4,
+		"pduty1": 0.2,
+		"pduty2": 0.2,
+		"voltage_scale": 0.01,
+		"comment": "voltage_scale should be equal with initial voltage scale of each channel. here the value is in V unit"
+	    },
+	    "commands": {
+		"autoset": ":AUTOSET",
+		"initialise": {
+		    "general": [
+			":HORIZONTAL:SCALE 1.0ms",
+			":HORIZONTAL:OFFSET 0",
+			":ACQUIRE:MODE SAMPLE",
+			":ACQUIRE:DEPMEM 1K",
+			":ACQUIRE:PRECISION 8",
+			":TRIGGER:SINGLE:EDGE:SOURCE CH1",
+			":TRIGGER:SINGLE:EDGE:COUPLING DC"
+	    ],
+		    "channel": [
+			":CH{}:DISP ON",
+			":CH{}:SCALE 10mv",
+			":CH{}:OFFSET 0V",
+			":CH{}:COUPLING DC"
+		    ]
+		},
+		"measure_params": {
+	    "turn_on": ":MEAS:DISP ON",
+	    "turn_off": ":MEAS:DISP OFF",
+	    "source": ":MEASure:SOURce CH{}",
+	    "vbase": ":MEASure:VBASE?"
+	},
+		"capture": {
+		    "begin": ":WAV:BEG CH{}",
+		    "wave_range": ":WAVEFORM:RANGE 0,1000",
+		    "fetch": ":WAV:FETC?",
+		    "end": ":WAV:END"
+		}
+	    },
+	    "queries": {
+		"autoset_progress": ":AUTOSET:PROGRESS?",
+		"parameters": {
+		    "general": {
+			"time_scale": ":HORIZONTAL:SCALE?",
+			"horizontal_offset": ":HORIZONTAL:OFFSET?",
+			"trigger_source": ":TRIGGER:SINGLE:EDGE:SOURCE?",
+			"trigger_level": ":TRIGGER:SINGLE:EDGE:LEVEL ?",
+			"acquire_mode": ":ACQUIRE:MODE?",
+			"memory_depth": ":ACQUIRE:DEPMEM?",
+			"memory_precision": ":ACQUIRE:PRECISION?"
+		    },
+		    "channel": {
+			"channel_display": ":CH{}:DISP?",
+			"voltage_scale": ":CH{}:SCALE?",
+			"vertical_offset": ":CH{}:OFFSET?",
+			"channel_coupling": ":CH{}:COUPLING?"
+		    }
+		}
+	    }
+	}
+    },
+    "optimizer": {
+	"pso": {
+	    "qber_threshold": 0.05,
+	    "min_x": -5000,
+	    "max_x": 5001,
+	    "max_particles": 20,
+	    "max_iteration": 20,
+	    "weight": 0.5,
+	    "c1": 1,
+	    "c2": 2,
+	    "qber_best_best": 0.1,
+	    "voltage_best_best": [0, 0, 0, 0],
+	    "initial_qber_best": 0.5,
+	    "dimensions": 4
+	},
+	"sm": {
+	    "qber_threshold": 0.05,
+	    "dimensions": 4,
+	    "bounds": [[-5000, 5000],[-5000, 5000],[-5000, 5000],[-5000, 5000]],
+	    "n_iterations": 1000,
+	    "step_size": 100,
+	    "temp": 10,
+	    "low": -5000,
+	    "high": 5001
+	}
+    },
+    "polarimeter": {
+	"thorlabs": {
+	    "resource_address": "USB",
+	    "mode": "SENS:CALC 5",
+	    "motor_on": "INP:ROT:STAT 1",
+	    "motor_speed": "INP:ROT:VEL 100",
+	    "queries": {
+		"wavelength": "SENS:CORR:WAV?",
+		"mode": "SENS:CALC?",
+		"speed": ":INP:ROT:VEL?",
+		"acquire_data": "SENS:DATA:LAT?"
+	    }
+	}
+    },
+    "p_controller": {
+	"ozoptics": {
+	    "port": "COM4",
+	    "baudrate": 115200,
+	    "timeout": 1
+	}
+    }
+}
+	    
+	    
+	
