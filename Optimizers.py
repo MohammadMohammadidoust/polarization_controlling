@@ -76,7 +76,7 @@ class PSO(object):
                 
             if flag == 1:
                 break
-            print("Current QBER: ", self.qber_best_best)
+            print("Current QBER: ", self.p_data_acquisition.qber)
             iteration += 1
         print("max iteration has been reached!")
 

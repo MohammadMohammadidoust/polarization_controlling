@@ -135,7 +135,7 @@ class OWON:
         if not all_equal:
             print("something went wrong!")
             print("add debugging asap!")
-        print("done! captured successfully")
+        #print("done! captured successfully")
             
     def calculate_voltage_and_time(self):
         self.scaled_data = {channel: [] for channel in self.channels}

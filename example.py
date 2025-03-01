@@ -45,11 +45,11 @@ optimizer = PSO(CONFIGS, acquirer, controller)
 counter = 0
 while True:
     acquirer.get_data()
-    print("qber: ",acquirer.qber)
-    if acquirer.qber > 0.02:
+    print("live qber: ",acquirer.qber)
+    if acquirer.qber > 0.1:
         optimizer.run()
     time.sleep(0.2)
     counter += 1
-    if counter % 10 == 1:
+    if counter % 100 == 1:
         acquirer.extract_results("output.csv")
 
