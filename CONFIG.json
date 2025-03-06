@@ -29,7 +29,7 @@
 			":ACQUIRE:PRECISION 8",
 			":TRIGGER:SINGLE:EDGE:SOURCE CH1",
 			":TRIGGER:SINGLE:EDGE:COUPLING DC"
-	    ],
+		    ],
 		    "channel": [
 			":CH{}:DISP ON",
 			":CH{}:SCALE 10mv",
@@ -38,11 +38,11 @@
 		    ]
 		},
 		"measure_params": {
-	    "turn_on": ":MEAS:DISP ON",
-	    "turn_off": ":MEAS:DISP OFF",
-	    "source": ":MEASure:SOURce CH{}",
-	    "vbase": ":MEASure:VBASE?"
-	},
+		    "turn_on": ":MEAS:DISP ON",
+		    "turn_off": ":MEAS:DISP OFF",
+		    "source": ":MEASure:SOURce CH{}",
+		    "vbase": ":MEASure:VBASE?"
+		},
 		"capture": {
 		    "begin": ":WAV:BEG CH{}",
 		    "wave_range": ":WAVEFORM:RANGE 0,1000",
@@ -70,7 +70,50 @@
 		    }
 		}
 	    }
-	}
+	},
+	"rigol": {
+	    "resource_address": "USB0::0x5345::0x1235::2052231::INSTR",
+	    "channels": {
+		"H": 1,
+		"V": 2,
+		"+": 3,
+		"-": 4
+	    },
+	    "wave": {
+		"amplitude": 0.05,
+		"frequency": 100,
+		"nduty1": 0.2,
+		"nduty2": 0.4,
+		"pduty1": 0.2,
+		"pduty2": 0.2,
+		"comment": "I should modify something about duties in rigol class"
+	    },
+	    "commands": {
+		"autoset": ":AUToscale",
+		"start_running": ":RUN",
+		"stop_running": ":STOP",
+		"channel_source": ":WAV:SOUR CHAN{}",
+		"initialise": {
+		    "general": [
+			":TRIG:EDGE:SOUR CHAN1",
+			":TRIG:EDGE:LEV 0.04",
+			":TRIG:EDGE:SLOP POS",
+			"TIMEBASE:HREF:MODE TPOSITION"
+		    ],
+		    "channel": [
+			":CHANNEL{}:DISP ON",
+			":CHANNEL{}:OFFSET 0",
+			":CHANNEL{}:SCALE 1",
+			":CH{}:COUPLING DC"
+		    ]
+		}
+	    },
+	    "queries": {
+		"trigger_status": ":TRIG:STAT?",
+		"preamble": ":WAV:PRE?",
+		"acquire_data": ":WAV:DATA?"
+	    }
+	}	    
     },
     "optimizer": {
 	"pso": {

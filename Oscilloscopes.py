@@ -8,7 +8,7 @@ from quantiphy import Quantity
 from scipy.signal import find_peaks
 
 class OWON:
-    def __init__(self,conf_dict):
+    def __init__(self, conf_dict):
         self.configs = conf_dict
         self.hv_qber = None
         self.pm_qber = None
@@ -312,6 +312,159 @@ class OWON:
         self.clean_wave_form_data(i_index, f_index)
         self.qber_calculator()
 
+
+    def update_data(self, additional_data):
+        self.get_data()
+        data_list = [self.unix_time, self.hv_qber, self.pm_qber, self.qber,
+                     additional_data]
+        for key, element in zip(self.result_dict.keys(), data_list):
+            self.result_dict[key].append(element)
+
+    def extract_results(self, output_name):
+        df = pd.DataFrame(self.result_dict)
+        df.to_csv(output_name, sep= ',')
+
+
+class RIGOL:
+    def __init__(self, conf_dict):
+        self.configs = conf_dict
+        self.hv_qber = None
+        self.pm_qber = None
+        self.qber = self.hv_qber
+        self.resource = pyvisa.ResourceManager()
+        self.resource_address = self.configs['scope']['rigol']['resource_address']
+        self.instrument = self.resource.open_resource(self.resource_address)
+        self.channels_dict = self.configs['scope']['rigol']['channels']
+        self.channels = list(self.channels_dict.values())
+        self.wave_amplitude = self.configs['scope']['rigol']['wave']['amplitude']
+        self.wave_frequency = self.configs['scope']['rigol']['wave']['frequency']
+        self.wave_period = 1.0 / self.wave_frequency
+        self.pduty1 = self.configs['scope']['rigol']['wave']['pduty1']
+        self.pduty2 = self.configs['scope']['rigol']['wave']['pduty2']
+        self.nduty1 = self.configs['scope']['rigol']['wave']['nduty1']
+        self.nduty2 = self.configs['scope']['rigol']['wave']['nduty2']
+        self.result_dict = {"Unix_time": [], "hv_qber": [], "pm_qber": [],
+                            "qber": [], "Additional_data": []}
+
+    def send(self, command):
+        self.instrument.write(str(command))
+
+    def query(self, command, strip= True):
+        if strip:
+            response = self.instrument.query(str(command)).strip()
+        else:
+            response = self.instrument.query(str(command))
+        return response
+
+    def auto_set_device(self):
+        self.send(self.configs['scope']['rigol']['commands']['autoset'])
+        time.sleep(1)
+        print("aouto set is done!")
+
+
+    def initialise(self):
+        for command in self.configs['scope']['rigol']['commands']['initialise']['general']:
+            self.send(command)
+        for channel in self.channels:
+            for command in self.configs['scope']['rigol']['commands']['initialise']['channel']:
+                self.send(command.format(channel))
+        time.sleep(1)
+        print("initialise done!")
+
+
+    def trigger_check(self):
+        status = self.configs['scope']['rigol']['queries']['trigger_status']
+        counter = 0
+        while counter <= 500:
+            state = self.query(status)
+            if state == "STOP":
+                return None
+            counter += 1
+            time.sleep(0.01)
+        print("something went wrong due to check trigger conditions")
+        exit()
+
+    def capture(self):
+        self.scaled_data = {}
+        self.send(self.configs['scope']['rigol']['commands']['stop_running'])
+        self.trigger_check()
+        for channel in self.channels:
+            self.send(self.configs['scope']['rigol']['commands']['channel_source'].format(channel))
+            preamble = self.query(self.configs['scope']['rigol']['queries']['preamble'],
+                                  strip= False).split(',')
+            format_type   = int(preamble[0])
+            data_type     = int(preamble[1])
+            um_points    = int(preamble[2])
+            num_avg       = int(preamble[3])
+            x_increment   = float(preamble[4])
+            x_origin      = float(preamble[5])
+            x_reference   = float(preamble[6])
+            y_increment   = float(preamble[7])
+            y_origin      = float(preamble[8])
+            y_reference   = float(preamble[9])
+
+            self.send(self.configs['scope']['rigol']['queries']['acquire_data'])
+            raw_data = self.instrument.read_raw()
+            header_length = int(raw_data[1]) + 2
+            raw_data = raw_data[header_length:-1]  # Remove header and terminator
+            data = np.frombuffer(raw_data, dtype='B')
+            voltage = (data - y_reference) * y_increment + y_origin
+            self.scaled_data[channel] = voltage
+            if channel == 1:
+                time_axis = (np.arange(len(voltage)) - x_reference) * x_increment
+                self.scaled_data['time_data'] = time_axis
+        _len = len(self.scaled_data[1])
+        if _len == 0:
+            print("something went wrong due to capture data!")
+        all_equal = all(len(self.scaled_data[key]) == _len for key in self.scaled_data)
+        if not all_equal:
+            print("something went wrong due to capture data!")
+        self.send(self.configs['scope']['rigol']['commands']['start_running'])
+        
+            
+
+    def visualise(self, data):
+        fig, ax = plt.subplots()
+        ax.set(xlabel='time (S)', ylabel='voltage (V)', title='WAVEFORM')
+        colours = ["-r", "-g", "-b", "-y"]
+        for (channel,colour) in zip(self.channels, colours):
+            ax.plot(data['time_data'], data[channel],
+                    colour, label= "CH{}".format(channel))
+        ax.grid()
+        plt.legend(loc="upper left")
+        plt.xlim([0, data['time_data'][-1]])
+        plt.show()
+
+    def extract_period_index(self):
+        end = np.where(self.scaled_data['time_data'] >= self.wave_period)[0]
+        start_index = 0
+        stop = end[0]
+        return [start_index, stop_index]
+
+    def clean_wave_form_data(self, initial_index, final_index):
+        self.cleaned_data = {}
+        for key in self.scaled_data:
+            self.cleaned_data[key] = self.scaled_data[key][initial_index:final_index]
+    def qber_calculator(self):
+        self.unix_time = time.time()
+        wave_size = len(self.cleaned_data[1])
+        first_index = 0
+        second_index = int(wave_size * self.pduty1)
+        third_index = int(wave_size * (self.pduty1 + self.nduty1))
+        last_index = int(wave_size * (self.pduty1 + self.nduty1 + self.pduty2))
+        H = np.average(self.cleaned_data[self.channels_dict['H']][first_index:second_index])
+        V = np.average(self.cleaned_data[self.channels_dict['V']][first_index:second_index])
+        self.hv_qber = V / (H + V)
+        PLUS = np.average(self.cleaned_data[self.channels_dict['+']][third_index:last_index])
+        MINUS = np.average(self.cleaned_data[self.channels_dict['-']][third_index:last_index])
+        self.pm_qber = MINUS / (PLUS + MINUS)
+        self.qber = self.hv_qber
+
+    def get_data(self):
+        self.capture()
+        i_index, f_index = self.extract_period_index()
+        self.clean_wave_form_data(i_index, f_index)
+        self.qber_calculator()
 
     def update_data(self, additional_data):
         self.get_data()
