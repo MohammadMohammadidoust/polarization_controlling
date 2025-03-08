@@ -53,30 +53,30 @@ instrument.write(":HORIZONTAL:SCALE 2.0ms")
 instrument.write(":MEAS:DISP ON")
 instrument.write(":MEASure:SOURce CH1")
 print('measure source: ', instrument.query(":MEASure:SOURce?"))
-ch1_offset = np.float64(instrument.query(":MEASure:VBASE?"))
+ch1_offset = np.float64(instrument.query(":MEASure:VMIN?"))
 print('measure VBase channel 1: ', ch1_offset)
 
 instrument.write(":MEASure:SOURce CH2")
 print('measure source: ', instrument.query(":MEASure:SOURce?"))
-ch2_offset = np.float64(instrument.query(":MEASure:VBASE?"))
+ch2_offset = np.float64(instrument.query(":MEASure:VMIN?"))
 print('measure VBase channel 2: ', ch2_offset)
 
 instrument.write(":MEASure:SOURce CH3")
 print('measure source: ', instrument.query(":MEASure:SOURce?"))
-ch3_offset = np.float64(instrument.query(":MEASure:VBASE?"))
+ch3_offset = np.float64(instrument.query(":MEASure:VMIN?"))
 print('measure VBase channel 3: ', ch3_offset)
 
-#instrument.write(":MEASure:SOURce CH4")
-#print('measure source: ', instrument.query(":MEASure:SOURce?"))
-#ch4_offset = np.float64(instrument.query(":MEASure:VBASE?"))
-#print('measure VBase channel 4: ', ch4_offset)
+instrument.write(":MEASure:SOURce CH4")
+print('measure source: ', instrument.query(":MEASure:SOURce?"))
+ch4_offset = np.float64(instrument.query(":MEASure:VMIN?"))
+print('measure VBase channel 4: ', ch4_offset)
 
 instrument.write(":MEAS:DISP OFF")
 
 off1 = ch1_offset / 0.01           #0.01 is 10mv means the channel voltage scale
 off2 = ch2_offset / 0.01
 off3 = ch3_offset / 0.01
-#off4 = ch4_offset / 0.01
+off4 = ch4_offset / 0.01
 
 #print('measure CH2 scale: ', off2)
 
@@ -93,14 +93,17 @@ instrument.write(":CH1:COUPLING DC")
 instrument.write(":CH2:DISP ON")
 instrument.write(":CH2:OFFSET 0V")
 instrument.write(":CH2:SCALE 10mv")
+instrument.write(":CH2:COUPLING DC")
 
 instrument.write(":CH3:DISP ON")
 instrument.write(":CH3:OFFSET 0V")
 instrument.write(":CH3:SCALE 10mv")
+instrument.write(":CH3:COUPLING AC")
 
-#instrument.write(":CH4:DISP ON")
-#instrument.write(":CH4:OFFSET 0V")
-#instrument.write(":CH4:SCALE 10mv")
+instrument.write(":CH4:DISP ON")
+instrument.write(":CH4:OFFSET 0V")
+instrument.write(":CH4:SCALE 10mv")
+instrument.write(":CH4:COUPLING AC")
 
 time.sleep(5)
 
@@ -120,9 +123,9 @@ adc_wave2 = instrument.query_binary_values(":WAV:FETC?", datatype = 'h')
 instrument.write(":WAV:BEG CH3")
 instrument.write(":WAVEFORM:RANGE 0,1000")
 adc_wave3 = instrument.query_binary_values(":WAV:FETC?", datatype = 'h')
-#instrument.write(":WAV:BEG CH4")
-#instrument.write(":WAVEFORM:RANGE 0,1000")
-#adc_wave4 = instrument.query_binary_values(":WAV:FETC?", datatype = 'h')
+instrument.write(":WAV:BEG CH4")
+instrument.write(":WAVEFORM:RANGE 0,1000")
+adc_wave4 = instrument.query_binary_values(":WAV:FETC?", datatype = 'h')
 instrument.write(":WAV:END")
 
 scale_time = Quantity(instrument.query(":HORI:SCAL?")).real
@@ -143,7 +146,7 @@ for index in range(len(adc_wave)):
     volt_wave1.append((float(adc_wave[index]) / 6400 - off1) * scale_voltage)
     volt_wave2.append((float(adc_wave2[index]) / 6400 - off2) * scale_voltage)
     volt_wave3.append((float(adc_wave3[index]) / 6400 - off3) * scale_voltage)
-    #volt_wave4.append((float(adc_wave4[index]) / 6400 - off4) * scale_voltage)
+    volt_wave4.append((float(adc_wave4[index]) / 6400 - off4) * scale_voltage)
     #time_list.append(scale_time * index)
     time_list.append(index/sample_rate)
 
@@ -189,7 +192,7 @@ ax.set(xlabel='time (S)', ylabel='voltage (V)', title='WAVEFORM')
 ax.plot(time_list, volt_wave1, "-r", label="CH1")
 #ax.plot(time_list, auto_volt_wave1, "-c", label="CH1_Auto")
 ax.plot(time_list, volt_wave2, "-g", label="CH2")
-ax.plot(time_list,volt_wave3, "-b", label="CH3")
+#ax.plot(time_list,volt_wave3, "-b", label="CH3")
 #ax.plot(time_list, volt_wave4, "-c", label="CH4")
 
 ax.grid()

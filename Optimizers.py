@@ -53,10 +53,10 @@ class PSO(object):
                     self.p_controller.send_voltages([self.voltage_best_best[i]
                                                      for i in range(self.dimensions)])
                     total_time = time.perf_counter() - begin_time
-                    print("Iteration number=", iteration)
-                    print("Total Time(s)=", total_time)
-                    print("Voltage Point(mV)=", self.voltage_best_best)
-                    print("Minimum QBER=", self.qber_best_best)
+                    #print("Iteration number=", iteration)
+                    #print("Total Time(s)=", total_time)
+                    #print("Voltage Point(mV)=", self.voltage_best_best)
+                    #print("Minimum QBER=", self.qber_best_best)
                     break
                 for dimension in range(self.dimensions):
                     r1, r2 = np.random.choice([0, 1], size= 2)
@@ -76,9 +76,9 @@ class PSO(object):
                 
             if flag == 1:
                 break
-            print("Current QBER: ", self.p_data_acquisition.qber)
+            print("Current QBER inside PSO running: ", self.p_data_acquisition.qber)
             iteration += 1
-        print("max iteration has been reached!")
+        print("Optimisation has been finished!")
 
 
 class SimulatedAnnealing():
