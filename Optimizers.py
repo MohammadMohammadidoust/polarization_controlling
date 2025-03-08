@@ -29,7 +29,7 @@ class PSO(object):
         begin_time = time.perf_counter()
         iteration = 0
         flag = 0
-
+        print("hi inja flag={} and iteration={}".format(flag, iteration))
         for particle_no in range(self.max_particles):
             for dimension in range(self.dimensions):
                 self.position_x[iteration][particle_no][dimension] = np.random.randint(low= self.min_x, high= self.max_x)
@@ -39,7 +39,7 @@ class PSO(object):
             for paticle_no in range(self.max_particles):
                 voltages = [self.position_x[iteration][particle_no][i] for i in range(self.dimensions)]
                 self.p_controller.send_voltages(voltages)
-                time.sleep(0.1)
+                time.sleep(0.7)
                 self.p_data_acquisition.update_data(voltages)
                 self.qber_values[iteration][particle_no] = self.p_data_acquisition.qber
                 if self.qber_values[iteration][particle_no] <= self.qber_best[particle_no]:
@@ -78,6 +78,7 @@ class PSO(object):
                 break
             print("Current QBER inside PSO running: ", self.p_data_acquisition.qber)
             iteration += 1
+        print("hi again inja flag={} and iteration={}".format(flag, iteration))
         print("Optimisation has been finished!")
 
 
@@ -104,7 +105,7 @@ class SimulatedAnnealing():
                 for dimension in range(self.dimensions):
                     best[dimension] = np.random.randint(low= self.low, high= self.high)
                 self.p_controller.send_voltages(self.best)
-                time.sleep(0.09)
+                time.sleep(1)
                 self.p_data_acquisition.update_data(self.best)
                 best_eval = self.p_data_acquisition.qber
             curr, curr_eval = best, best_eval
@@ -113,7 +114,7 @@ class SimulatedAnnealing():
                 candidate = curr + np.random.choice([-1, -0.7, -0.5, -0.3, 0, 0.3, 0.5, 0.7, 1],
                                                     size=len(self.bounds)) * self.step_size
                 self.p_controller.send_voltages(candidate)
-                time.sleep(0.09)
+                time.sleep(1)
                 self.p_data_acquisition.update_data(self.best)
                 candidate_eval = self.p_data_acquisition.qber
                 if candidate_eval < best_eval:

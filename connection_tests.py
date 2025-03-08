@@ -1,9 +1,8 @@
 import time
 import json
-from Oscilloscopes import OWON
+from Oscilloscopes import *
 from Polarimeters import Thorlabs
 from PolarizationControllers import OzOptics
-from Optimizers import PSO
 
 CONFIG_FILE = "CONFIG.json"
 
@@ -17,7 +16,7 @@ def p_controller_configuration(brand= "OzOptics"):
     return p_controller
 
 def scope_configurations(brand= "OWON"):
-    scope = OWON(CONFIGS)
+    scope = RIGOL(CONFIGS)
     print("Scope Address: ", scope.resource_address)
     print(scope.query("*IDN?"))
     return scope
@@ -26,3 +25,5 @@ def scope_configurations(brand= "OWON"):
 controller = p_controller_configuration()
 controller.send_voltages([0, 0, 0, 0])
 scope = scope_configurations()
+depth = scope.query(":ACQUIRE:MDEPTH?")
+print("memory depth: ", depth)

@@ -369,7 +369,7 @@ class RIGOL:
 
     def auto_set_device(self):
         self.send(self.configs['scope']['rigol']['commands']['autoset'])
-        time.sleep(1)
+        time.sleep(5)
         print("aouto set is done!")
 
 
@@ -449,36 +449,76 @@ class RIGOL:
     def extract_period_index(self):
         end = np.where(self.scaled_data['time_data'] >= self.wave_period)[0]
         start_index = 0
-        stop = end[0]
+        stop_index = end[0]
         return [start_index, stop_index]
+
+    def extract_period_index_v4(self, s_channel):
+        zero_buffer = 0.007
+        signal_buffer = self.wave_amplitude/5
+        first_zero_index = next((i for i, point in enumerate(self.scaled_data[s_channel]) if point <= zero_buffer), None)
+        first_signal_index = next((i for i, point in enumerate(self.scaled_data[s_channel][first_zero_index:],
+                                                               start=first_zero_index) if point >= signal_buffer), None)
+        end_time_value = self.scaled_data['time_data'][first_signal_index] + self.wave_period
+        second_signal_index = np.where(self.scaled_data["time_data"] >= end_time_value)[0][0]
+        return [first_signal_index, second_signal_index]
 
     def clean_wave_form_data(self, initial_index, final_index):
         self.cleaned_data = {}
         for key in self.scaled_data:
             self.cleaned_data[key] = self.scaled_data[key][initial_index:final_index]
-    def qber_calculator(self):
+        time_shift = self.scaled_data['time_data'][initial_index]
+        self.cleaned_data['time_data'] = np.array(self.cleaned_data['time_data']) - time_shift
+
+    def discriminator(self, s_channel):
+        type_one_wave = False
+        mid_point = int(len(self.cleaned_data[s_channel])/2)
+        zero_buffer = 0.001
+        if np.average(self.cleaned_data[s_channel][mid_point-5:mid_point + 5]) > zero_buffer:
+            type_one_wave = True
+        return type_one_wave
+
+    def qber_calculator(self, wave_type_one):
         self.unix_time = time.time()
-        wave_size = len(self.cleaned_data[1])
+        first_rise_time = self.wave_period * self.pduty1
+        first_fall_time = self.wave_period * self.nduty1
+        second_rise_time = self.wave_period * self.pduty2
+        second_fall_time = self.wave_period * self.nduty2
         first_index = 0
-        second_index = int(wave_size * self.pduty1)
-        third_index = int(wave_size * (self.pduty1 + self.nduty1))
-        last_index = int(wave_size * (self.pduty1 + self.nduty1 + self.pduty2))
-        H = np.average(self.cleaned_data[self.channels_dict['H']][first_index:second_index])
-        V = np.average(self.cleaned_data[self.channels_dict['V']][first_index:second_index])
-        self.hv_qber = V / (H + V)
-        PLUS = np.average(self.cleaned_data[self.channels_dict['+']][third_index:last_index])
-        MINUS = np.average(self.cleaned_data[self.channels_dict['-']][third_index:last_index])
-        self.pm_qber = MINUS / (PLUS + MINUS)
-        self.qber = self.hv_qber
+        second_index = np.where(self.cleaned_data["time_data"] >= first_rise_time)[0][0]
+        if wave_type_one:
+            third_index = np.where(self.cleaned_data['time_data'] >=
+                                   (first_rise_time + first_fall_time))[0][0]
+            last_index = np.where(self.cleaned_data['time_data'] >=
+                                  (first_rise_time + first_fall_time + second_rise_time))[0][0]
+            H = np.average(self.cleaned_data[self.channels_dict['H']][first_index:second_index])
+            V = np.average(self.cleaned_data[self.channels_dict['V']][first_index:second_index])
+            self.hv_qber = V / (H + V)
+            PLUS = np.average(self.cleaned_data[self.channels_dict['+']][third_index:last_index])
+            MINUS = np.average(self.cleaned_data[self.channels_dict['-']][third_index:last_index])
+            self.pm_qber = MINUS / (PLUS + MINUS)
+            self.qber = self.hv_qber
+        else:
+            third_index = np.where(self.cleaned_data['time_data'] >=
+                                   (first_rise_time + second_fall_time))[0][0]
+            last_index = np.where(self.cleaned_data['time_data'] >=
+                                  (first_rise_time + second_fall_time + second_rise_time))[0][0]
+            H = np.average(self.cleaned_data[self.channels_dict['H']][first_index:second_index])
+            V = np.average(self.cleaned_data[self.channels_dict['V']][first_index:second_index])
+            self.hv_qber = V / (H + V)
+            PLUS = np.average(self.cleaned_data[self.channels_dict['+']][third_index:last_index])
+            MINUS = np.average(self.cleaned_data[self.channels_dict['-']][third_index:last_index])
+            self.pm_qber = MINUS / (PLUS + MINUS)
+            self.qber = self.hv_qber
 
-    def get_data(self):
+    def get_data(self, source_channel= 1):
         self.capture()
-        i_index, f_index = self.extract_period_index()
+        i_index, f_index = self.extract_period_index_v4(source_channel)
         self.clean_wave_form_data(i_index, f_index)
-        self.qber_calculator()
+        type_one_wave = self.discriminator(source_channel)
+        self.qber_calculator(type_one_wave)
 
-    def update_data(self, additional_data):
-        self.get_data()
+    def update_data(self, additional_data, source_channel= 1):
+        self.get_data(source_channel)
         data_list = [self.unix_time, self.hv_qber, self.pm_qber, self.qber,
                      additional_data]
         for key, element in zip(self.result_dict.keys(), data_list):
