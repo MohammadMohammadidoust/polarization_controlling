@@ -41,7 +41,8 @@
 		    "turn_on": ":MEAS:DISP ON",
 		    "turn_off": ":MEAS:DISP OFF",
 		    "source": ":MEASure:SOURce CH{}",
-		    "vbase": ":MEASure:VBASE?"
+		    "vbase": ":MEASure:VBASE?",
+		    "vmin": ":MEASure:VMIN?"
 		},
 		"capture": {
 		    "begin": ":WAV:BEG CH{}",

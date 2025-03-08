@@ -61,9 +61,9 @@ class OWON:
         for channel in self.channels:
             source_command = self.configs['scope']['owon']['commands']['measure_params']['source']
             self.send(source_command.format(channel))
-            self.channels_params[channel]['vbase'] = np.float64(
-                self.query(self.configs['scope']['owon']['commands']['measure_params']['vbase']))
-            self.channels_params[channel]['offset'] = self.channels_params[channel]['vbase'] / self.v_scale
+            self.channels_params[channel]['vmin'] = np.float64(
+                self.query(self.configs['scope']['owon']['commands']['measure_params']['vmin']))
+            self.channels_params[channel]['offset'] = self.channels_params[channel]['vmin'] / self.v_scale
         self.send(self.configs['scope']['owon']['commands']['measure_params']['turn_off'])
 
     def initialise(self):
@@ -144,17 +144,21 @@ class OWON:
             self.scaled_data[channel] = [(float(item) / 6400 - self.channels_params[channel]['offset']) *
                                          self.voltage_scale for item in self.data_dict[channel]]
 
-    def visualise(self, data):
+    def visualise(self, data, test_form= False):
         fig, ax = plt.subplots()
         ax.set(xlabel='time (S)', ylabel='voltage (V)', title='WAVEFORM')
-        colours = ["-r", "-g", "-b", "-y"]
-        for (channel,colour) in zip(self.channels, colours):
-            ax.plot(data['time_data'], data[channel],
-                    colour, label= "CH{}".format(channel))
-        ax.grid()
-        plt.legend(loc="upper left")
-        plt.xlim([0, data['time_data'][-1]])
-        plt.show()
+        if not test_form:
+            colours = ["-r", "-g", "-b", "-y"]
+            for (channel,colour) in zip(self.channels, colours):
+                ax.plot(data['time_data'], data[channel], colour, label= "CH{}".format(channel))
+            ax.grid()
+            plt.legend(loc="upper left")
+            plt.xlim([0, data['time_data'][-1]])
+            plt.show()
+        else:
+            ax.plot(np.arange(len(data)), data, label= "visualising test wave form")
+            plt.legend(loc="upper left")
+            plt.show()
 
     def extract_period_index_v1(self, wave_form):
         zero_buffer = 0.0001
@@ -252,15 +256,22 @@ class OWON:
         return [peaks[0], peaks[0] + period_samples]
 
     def extract_period_index_v4(self, wave_form):
-        zero_buffer = 0.0001
-        signal_buffer = self.wave_amplitude/4
-        first_zero_index = next((i for i, point in enumerate(wave_form) if point <= zero_buffer), None)
-        first_signal_index = next((i for i, point in enumerate(wave_form[first_zero_index:],
+        zero_buffer = 0.001
+        signal_buffer = self.wave_amplitude/5
+        try: 
+            first_zero_index = next((i for i, point in enumerate(wave_form) if point <= zero_buffer), None)
+            first_signal_index = next((i for i, point in enumerate(wave_form[first_zero_index:],
                                                                start=first_zero_index) if point >= signal_buffer), None)
-        second_signal_index = first_signal_index + int(self.sample_rate*self.wave_period)
-        return [first_signal_index, second_signal_index]
+            second_signal_index = first_signal_index + int(self.sample_rate*self.wave_period)
+            return [first_signal_index, second_signal_index]
+        except TypeError:
+            first_zero_index = next((i for i, point in enumerate(wave_form) if point <= zero_buffer), None)
+            print("first zero index: ", first_zero_index)
+            first_signal_index = next((i for i, point in enumerate(wave_form[first_zero_index:],
+                                                               start=first_zero_index) if point >= signal_buffer), None)
+            print("Can not extract period indices!!!")
+            self.visualise(wave_form, test_form= True)
         
-
     def clean_wave_form_data(self, initial_index, final_index):
             self.cleaned_data = {}
             for key in self.scaled_data:
@@ -307,7 +318,7 @@ class OWON:
     def get_data(self):
         self.capture()
         self.calculate_voltage_and_time()
-        test_wave_form = self.scaled_data[1]
+        test_wave_form = self.scaled_data[2]
         i_index, f_index = self.extract_period_index_v4(test_wave_form)
         self.clean_wave_form_data(i_index, f_index)
         self.qber_calculator()
