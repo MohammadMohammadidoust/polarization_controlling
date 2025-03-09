@@ -6,6 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from quantiphy import Quantity
 from scipy.signal import find_peaks
+from scipy.signal import savgol_filter
 
 class OWON:
     def __init__(self, conf_dict):
@@ -451,6 +452,13 @@ class RIGOL:
         start_index = 0
         stop_index = end[0]
         return [start_index, stop_index]
+
+    def smoother(self):
+        self.smoothed_data = {}
+        for channel in self.channels:
+            self.smoothed_data[channel] = savgol_filter(self.scaled_data[channel], 51, 3)
+        self.smoothed_data['time_data'] = self.scaled_data['time_data']
+            
 
     def extract_period_index_v4(self, s_channel):
         zero_buffer = 0.007
