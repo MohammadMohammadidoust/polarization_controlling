@@ -118,6 +118,7 @@
     },
     "optimizer": {
 	"pso": {
+	    "learning_mode": "cumulative_learning",
 	    "qber_threshold": 0.05,
 	    "min_x": -5000,
 	    "max_x": 5001,

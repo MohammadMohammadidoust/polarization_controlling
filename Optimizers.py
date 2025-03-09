@@ -5,6 +5,7 @@ class PSO(object):
     def __init__(self, conf_dict, acquire_polarization_instance,
                  polarization_controller_instance):
         self.configs = conf_dict
+        self.learning_mode = self.configs['optimizer']['pso']['learning_mode']
         self.threshold = self.configs['optimizer']['pso']['qber_threshold']
         self.min_x = self.configs['optimizer']['pso']['min_x']
         self.max_x = self.configs['optimizer']['pso']['max_x']
@@ -25,11 +26,24 @@ class PSO(object):
         self.qber_best = np.empty([self.max_particles])
         self.voltage_best = np.empty([self.max_iteration, self.max_particles, self.dimensions])
         
+
+    def reset_state(self):
+        self.qber_values = np.empty([self.max_iteration, self.max_particles])
+        self.position_x = np.empty([self.max_iteration, self.max_particles, self.dimensions])
+        self.velocity = np.empty([self.max_iteration, self.max_particles, self.dimensions])
+        self.qber_best = np.empty([self.max_particles])
+        self.voltage_best = np.empty([self.max_iteration, self.max_particles, self.dimensions])
+        if self.learning_mode == "independent_learning":
+            self.qber_best_best = self.configs['optimizer']['pso']['qber_best_best']
+            self.voltage_best_best = self.configs['optimizer']['pso']['voltage_best_best']
+            
+        
+
     def run(self):
+        self.reset_state()
         begin_time = time.perf_counter()
         iteration = 0
         flag = 0
-        print("hi inja flag={} and iteration={}".format(flag, iteration))
         for particle_no in range(self.max_particles):
             for dimension in range(self.dimensions):
                 self.position_x[iteration][particle_no][dimension] = np.random.randint(low= self.min_x, high= self.max_x)
@@ -78,7 +92,6 @@ class PSO(object):
                 break
             print("Current QBER inside PSO running: ", self.p_data_acquisition.qber)
             iteration += 1
-        print("hi again inja flag={} and iteration={}".format(flag, iteration))
         print("Optimisation has been finished!")
 
 
