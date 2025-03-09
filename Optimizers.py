@@ -53,7 +53,7 @@ class PSO(object):
             for paticle_no in range(self.max_particles):
                 voltages = [self.position_x[iteration][particle_no][i] for i in range(self.dimensions)]
                 self.p_controller.send_voltages(voltages)
-                time.sleep(0.7)
+                time.sleep(0.4)
                 self.p_data_acquisition.update_data(voltages)
                 self.qber_values[iteration][particle_no] = self.p_data_acquisition.qber
                 if self.qber_values[iteration][particle_no] <= self.qber_best[particle_no]:

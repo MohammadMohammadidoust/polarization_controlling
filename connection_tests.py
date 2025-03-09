@@ -25,5 +25,3 @@ def scope_configurations(brand= "OWON"):
 controller = p_controller_configuration()
 controller.send_voltages([0, 0, 0, 0])
 scope = scope_configurations()
-depth = scope.query(":ACQUIRE:MDEPTH?")
-print("memory depth: ", depth)

@@ -52,10 +52,11 @@ while True:
     print("live hv_qber: ",acquirer.hv_qber)
     if acquirer.qber > 1 or acquirer.qber < 0:
         acquirer.visualise(acquirer.cleaned_data)
-    if acquirer.qber > 0.12:
-        time.sleep(0.5)
+        acquirer.visualise(acquirer.scaled_data)
+    if 0.12 < acquirer.qber < 1:
+        time.sleep(0.3)
         optimizer.run()
-    time.sleep(0.5)
+    time.sleep(0.3)
     counter += 1
     if counter % 100 == 0:
         #acquirer.visualise(acquirer.cleaned_data)

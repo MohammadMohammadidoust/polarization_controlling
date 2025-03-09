@@ -456,11 +456,17 @@ class RIGOL:
         zero_buffer = 0.007
         signal_buffer = self.wave_amplitude/5
         first_zero_index = next((i for i, point in enumerate(self.scaled_data[s_channel]) if point <= zero_buffer), None)
-        first_signal_index = next((i for i, point in enumerate(self.scaled_data[s_channel][first_zero_index:],
-                                                               start=first_zero_index) if point >= signal_buffer), None)
-        end_time_value = self.scaled_data['time_data'][first_signal_index] + self.wave_period
-        second_signal_index = np.where(self.scaled_data["time_data"] >= end_time_value)[0][0]
-        return [first_signal_index, second_signal_index]
+        try:
+            first_signal_index = next((i for i, point in enumerate(self.scaled_data[s_channel][first_zero_index:],
+                                                                   start=first_zero_index) if point >= signal_buffer), None)
+            end_time_value = self.scaled_data['time_data'][first_signal_index] + self.wave_period
+            second_signal_index = np.where(self.scaled_data["time_data"] >= end_time_value)[0][0]
+            return [first_signal_index, second_signal_index]
+        except Exception as e:
+            print(e)
+            self.visualise(self.scaled_data)
+            print("len data: ", len(self.scaled_data[s_channel]))
+            exit()
 
     def clean_wave_form_data(self, initial_index, final_index):
         self.cleaned_data = {}
