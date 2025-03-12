@@ -2,8 +2,18 @@ import numpy as np
 import time
 
 class PSO(object):
-    def __init__(self, conf_dict, acquire_polarization_instance,
-                 polarization_controller_instance):
+    """
+    Particle Swarm Optimization (PSO) for minimizing QBER by adjusting optical fiber voltage.
+    
+    The code maintains:
+      - A history of positions and velocities over iterations.
+      - Personal best positions and scores for each particle.
+      - A global best position and score.
+    
+    The evaluation loop is sequential (due to hardware limitations) and the velocity/position updates are vectorized.
+    """
+    
+    def __init__(self, conf_dict, acquire_polarization_instance, polarization_controller_instance):
         self.configs = conf_dict
         self.learning_mode = self.configs['optimizer']['pso']['learning_mode']
         self.threshold = self.configs['optimizer']['pso']['qber_threshold']
@@ -14,85 +24,68 @@ class PSO(object):
         self.weight = self.configs['optimizer']['pso']['weight']
         self.c1 = self.configs['optimizer']['pso']['c1']
         self.c2 = self.configs['optimizer']['pso']['c2']
-        self.qber_best_best = self.configs['optimizer']['pso']['qber_best_best']
-        self.voltage_best_best = self.configs['optimizer']['pso']['voltage_best_best']
+        self.best_global_score = self.configs['optimizer']['pso']['qber_best_best']
+        self.best_global_position = self.configs['optimizer']['pso']['voltage_best_best']
         self.initial_qber_best = self.configs['optimizer']['pso']['initial_qber_best']
         self.dimensions = self.configs['optimizer']['pso']['dimensions']
         self.p_controller = polarization_controller_instance
         self.p_data_acquisition = acquire_polarization_instance
-        self.position_x = np.empty([self.max_iteration, self.max_particles, self.dimensions])
-        self.velocity = np.empty([self.max_iteration, self.max_particles, self.dimensions])
-        self.qber_values = np.empty([self.max_iteration, self.max_particles])
-        self.qber_best = np.empty([self.max_particles])
-        self.voltage_best = np.empty([self.max_iteration, self.max_particles, self.dimensions])
+        self.position_x = np.empty((self.max_iteration, self.max_particles, self.dimensions))
+        self.velocity = np.empty((self.max_iteration, self.max_particles, self.dimensions))
+        self.qber_values = np.empty((self.max_iteration, self.max_particles))
+        self.personal_best_positions = np.empty((self.max_particles, self.dimensions))
+        self.personal_best_scores = np.empty(self.max_particles)
         
-
     def reset_state(self):
-        self.qber_values = np.empty([self.max_iteration, self.max_particles])
-        self.position_x = np.empty([self.max_iteration, self.max_particles, self.dimensions])
-        self.velocity = np.empty([self.max_iteration, self.max_particles, self.dimensions])
-        self.qber_best = np.empty([self.max_particles])
-        self.voltage_best = np.empty([self.max_iteration, self.max_particles, self.dimensions])
-        self.qber_best_best = self.configs['optimizer']['pso']['qber_best_best']
+        self.position_x.fill(0)
+        self.velocity.fill(0)
+        self.qber_values.fill(0)
+        self.personal_best_positions.fill(0)
+        self.personal_best_scores.fill(self.initial_qber_best)
+        self.best_global_score = self.configs['optimizer']['pso']['qber_best_best']
         if self.learning_mode == "independent_learning":
-            self.voltage_best_best = self.configs['optimizer']['pso']['voltage_best_best']
-            
-        
-
+            self.best_global_position = self.configs['optimizer']['pso']['voltage_best_best']
+    
     def run(self):
         self.reset_state()
         begin_time = time.perf_counter()
-        iteration = 0
-        flag = 0
-        for particle_no in range(self.max_particles):
-            for dimension in range(self.dimensions):
-                self.position_x[iteration][particle_no][dimension] = np.random.randint(low= self.min_x, high= self.max_x)
-                self.velocity[iteration][particle_no][dimension]= np.random.randint(low= self.min_x, high= self.max_x)
-            self.qber_best[particle_no] = self.initial_qber_best # 50% QBER
-        while iteration < (self.max_iteration - 1):
-            for paticle_no in range(self.max_particles):
-                voltages = [self.position_x[iteration][particle_no][i] for i in range(self.dimensions)]
-                self.p_controller.send_voltages(voltages)
+        self.position_x[0] = np.random.randint(self.min_x, self.max_x, (self.max_particles, self.dimensions))
+        self.velocity[0] = np.random.randint(self.min_x, self.max_x, (self.max_particles, self.dimensions))
+        self.personal_best_positions = self.position_x[0].copy()
+        for iteration in range(self.max_iteration - 1):
+            for particle_no in range(self.max_particles):
+                current_position = self.position_x[iteration, particle_no, :]
+                current_voltage = current_position.astype(int).tolist()
+                self.p_controller.send_voltages(current_voltage)
                 time.sleep(0.2)
-                self.p_data_acquisition.update_data(voltages)
-                self.qber_values[iteration][particle_no] = self.p_data_acquisition.qber
-                if self.qber_values[iteration][particle_no] <= self.qber_best[particle_no]:
-                    self.qber_best[particle_no] = self.qber_values[iteration][particle_no]
-                    self.voltage_best[iteration][particle_no] = self.position_x[iteration][particle_no]
-                if self.qber_values[iteration][particle_no] <= self.qber_best_best:
-                    self.qber_best_best = self.qber_values[iteration][particle_no]
-                    self.voltage_best_best = self.position_x[iteration][particle_no]
-                if self.qber_best_best < self.threshold:
-                    flag = 1
-                    self.p_controller.send_voltages([self.voltage_best_best[i]
-                                                     for i in range(self.dimensions)])
+                self.p_data_acquisition.update_data(current_voltage)
+                current_qber = self.p_data_acquisition.qber
+                self.qber_values[iteration, particle_no] = current_qber
+                if current_qber <= self.personal_best_scores[particle_no]:
+                    self.personal_best_scores[particle_no] = current_qber
+                    self.personal_best_positions[particle_no] = current_position.copy()
+                if current_qber <= self.best_global_score:
+                    self.best_global_score = current_qber
+                    self.best_global_position = current_position.copy()
+                if self.best_global_score < self.threshold:
+                    final_voltage = self.best_global_position.astype(int).tolist()
+                    self.p_controller.send_voltages(final_voltage)
                     total_time = time.perf_counter() - begin_time
-                    #print("Iteration number=", iteration)
-                    #print("Total Time(s)=", total_time)
-                    #print("Voltage Point(mV)=", self.voltage_best_best)
-                    #print("Minimum QBER=", self.qber_best_best)
-                    break
-                for dimension in range(self.dimensions):
-                    r1, r2 = np.random.choice([0, 1], size= 2)
-                    self.velocity[iteration + 1][particle_no][dimension] = self.weight * self.velocity[iteration][particle_no][dimension] + self.c1 * r1 * (self.voltage_best[iteration][particle_no][dimension] - self.position_x[iteration][particle_no][dimension]) + self.c2 * r2 * (self.voltage_best_best[dimension] - self.position_x[iteration][particle_no][dimension])
-                    self.position_x[iteration + 1][particle_no][dimension] = self.position_x[iteration][particle_no][dimension] + self.velocity[iteration + 1][particle_no][dimension]
-                    if self.position_x[iteration + 1][particle_no][dimension] > self.max_x:
-                        self.position_x[iteration + 1][particle_no][dimension] = self.max_x
-                    if self.position_x[iteration + 1][particle_no][dimension] < self.min_x:
-                        self.position_x[iteration + 1][particle_no][dimension] = self.min_x
-                try:
-                    self.position_x[iteration + 1][particle_no]=[int(self.position_x[iteration + 1][particle_no][i])
-                                                                 for i in range(self.dimensions)]
-                except:
-                    self.position_x[iteration + 1][particle_no] = [0, 0, 0, 0]
-                    print("error")
-                    break
-                
-            if flag == 1:
-                break
-            print("Current QBER inside PSO running: ", self.p_data_acquisition.qber)
-            iteration += 1
-        print("Optimisation has been finished!")
+                    print(f"Optimization finished at iteration {iteration} with total time: {total_time:.2f}s")
+                    return
+            r1 = np.random.rand(self.max_particles, self.dimensions)
+            r2 = np.random.rand(self.max_particles, self.dimensions)
+            new_velocity = (self.weight * self.velocity[iteration] +
+                            self.c1 * r1 * (self.personal_best_positions - self.position_x[iteration]) +
+                            self.c2 * r2 * (self.best_global_position - self.position_x[iteration]))
+            new_position = self.position_x[iteration] + new_velocity
+            new_position = np.clip(new_position, self.min_x, self.max_x)
+            self.velocity[iteration + 1] = new_velocity
+            self.position_x[iteration + 1] = new_position
+            print(f"Current QBER in iteration {iteration}: {self.p_data_acquisition.qber}")        
+        print("Optimization finished without reaching the threshold.")
+        total_time = time.perf_counter() - begin_time
+        print(f"Total time: {total_time:.2f}s")
 
 
 class SimulatedAnnealing():

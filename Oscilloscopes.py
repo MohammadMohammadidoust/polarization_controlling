@@ -494,6 +494,7 @@ class RIGOL:
 
     def qber_calculator(self, wave_type_one):
         self.unix_time = time.time()
+        epsilon = 1e-10
         first_rise_time = self.wave_period * self.pduty1
         first_fall_time = self.wave_period * self.nduty1
         second_rise_time = self.wave_period * self.pduty2
@@ -507,11 +508,8 @@ class RIGOL:
                                   (first_rise_time + first_fall_time + second_rise_time))[0][0]
             H = np.average(self.cleaned_data[self.channels_dict['H']][first_index:second_index])
             V = np.average(self.cleaned_data[self.channels_dict['V']][first_index:second_index])
-            self.hv_qber = V / (H + V)
             PLUS = np.average(self.cleaned_data[self.channels_dict['+']][third_index:last_index])
             MINUS = np.average(self.cleaned_data[self.channels_dict['-']][third_index:last_index])
-            self.pm_qber = MINUS / (PLUS + MINUS)
-
         else:
             third_index = np.where(self.cleaned_data['time_data'] >=
                                    (first_rise_time + second_fall_time))[0][0]
@@ -519,20 +517,12 @@ class RIGOL:
                                   (first_rise_time + second_fall_time + second_rise_time))[0][0]
             H = np.average(self.cleaned_data[self.channels_dict['H']][third_index:last_index])
             V = np.average(self.cleaned_data[self.channels_dict['V']][third_index:last_index])
-            self.hv_qber = V / (H + V)
             PLUS = np.average(self.cleaned_data[self.channels_dict['+']][first_index:second_index])
             MINUS = np.average(self.cleaned_data[self.channels_dict['-']][first_index:second_index])
-            self.pm_qber = MINUS / (PLUS + MINUS)
-        if self.hv_qber > 1:
-            self.hv_qber = 1
-        elif self.hv_qber < 0:
-            self.hv_qber = 0
-        if self.pm_qber > 1:
-            self.pm_qber = 1
-        elif self.pm_qber < 0:
-            self.pm_qber = 0
-        self.qber = 1 / np.sqrt(2) * np.sqrt(self.hv_qber**2 + self.pm_qber**2)
-
+        self.hv_qber = np.clip(V / (H + V + epsilon), 0, 1)
+        self.pm_qber = np.clip(MINUS / (PLUS + MINUS + epsilon), 0, 1)
+        self.qber = (1 / np.sqrt(2)) * np.sqrt(self.hv_qber**2 + self.pm_qber**2)
+        
     def get_data(self, source_channel= 1):
         self.capture()
         i_index, f_index = self.extract_period_index_v4(source_channel)
