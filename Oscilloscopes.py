@@ -396,7 +396,7 @@ class RIGOL:
         print("something went wrong due to check trigger conditions")
         exit()
 
-    def capture(self):
+    def capture(self, attempt= 0, max_attempts= 5):
         self.scaled_data = {}
         self.send(self.configs['scope']['rigol']['commands']['stop_running'])
         self.trigger_check()
@@ -426,11 +426,15 @@ class RIGOL:
                 time_axis = (np.arange(len(voltage)) - x_reference) * x_increment
                 self.scaled_data['time_data'] = time_axis
         _len = len(self.scaled_data[1])
-        if _len == 0:
-            print("something went wrong due to capture data!")
         all_equal = all(len(self.scaled_data[key]) == _len for key in self.scaled_data)
-        if not all_equal:
+        if _len == 0 or not all_equal:
             print("something went wrong due to capture data!")
+            if attempt < max_attempts:
+                print(f"Retrying capture (attempt {attempt + 1} of {max_attempts})...")
+                return self.capture(attempt=attempt + 1, max_attempts=max_attempts)
+            else:
+                print("Maximum capture attempts reached. Exiting capture.")
+                exit()
         self.send(self.configs['scope']['rigol']['commands']['start_running'])
         
             
