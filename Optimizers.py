@@ -33,8 +33,8 @@ class PSO(object):
         self.velocity = np.empty([self.max_iteration, self.max_particles, self.dimensions])
         self.qber_best = np.empty([self.max_particles])
         self.voltage_best = np.empty([self.max_iteration, self.max_particles, self.dimensions])
+        self.qber_best_best = self.configs['optimizer']['pso']['qber_best_best']
         if self.learning_mode == "independent_learning":
-            self.qber_best_best = self.configs['optimizer']['pso']['qber_best_best']
             self.voltage_best_best = self.configs['optimizer']['pso']['voltage_best_best']
             
         
@@ -53,7 +53,7 @@ class PSO(object):
             for paticle_no in range(self.max_particles):
                 voltages = [self.position_x[iteration][particle_no][i] for i in range(self.dimensions)]
                 self.p_controller.send_voltages(voltages)
-                time.sleep(0.4)
+                time.sleep(0.2)
                 self.p_data_acquisition.update_data(voltages)
                 self.qber_values[iteration][particle_no] = self.p_data_acquisition.qber
                 if self.qber_values[iteration][particle_no] <= self.qber_best[particle_no]:
@@ -118,7 +118,7 @@ class SimulatedAnnealing():
                 for dimension in range(self.dimensions):
                     best[dimension] = np.random.randint(low= self.low, high= self.high)
                 self.p_controller.send_voltages(self.best)
-                time.sleep(1)
+                time.sleep(0.2)
                 self.p_data_acquisition.update_data(self.best)
                 best_eval = self.p_data_acquisition.qber
             curr, curr_eval = best, best_eval
@@ -127,7 +127,7 @@ class SimulatedAnnealing():
                 candidate = curr + np.random.choice([-1, -0.7, -0.5, -0.3, 0, 0.3, 0.5, 0.7, 1],
                                                     size=len(self.bounds)) * self.step_size
                 self.p_controller.send_voltages(candidate)
-                time.sleep(1)
+                time.sleep(0.2)
                 self.p_data_acquisition.update_data(self.best)
                 candidate_eval = self.p_data_acquisition.qber
                 if candidate_eval < best_eval:

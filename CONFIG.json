@@ -73,7 +73,7 @@
 	    }
 	},
 	"rigol": {
-	    "resource_address": "TCPIP::169.254.1.20::INSTR",
+	    "resource_address": "USB0::0x1AB1::0x04B0::DS6A231100003::INSTR",
 	    "channels": {
 		"H": 1,
 		"V": 2,
@@ -97,7 +97,7 @@
 		"initialise": {
 		    "general": [
 			":TRIG:EDGE:SOUR CHAN1",
-			":TRIG:EDGE:LEV 0.04",
+			":TRIG:EDGE:LEV 0.004",
 			":TRIG:EDGE:SLOP POS",
 			"TIMEBASE:HREF:MODE TPOSITION"
 		    ],
@@ -118,8 +118,8 @@
     },
     "optimizer": {
 	"pso": {
-	    "learning_mode": "independent_learning",
-	    "qber_threshold": 0.05,
+	    "learning_mode": "cumulative_learning",
+	    "qber_threshold": 0.09,
 	    "min_x": -5000,
 	    "max_x": 5001,
 	    "max_particles": 20,

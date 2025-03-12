@@ -456,23 +456,24 @@ class RIGOL:
     def smoother(self):
         self.smoothed_data = {}
         for channel in self.channels:
-            self.smoothed_data[channel] = savgol_filter(self.scaled_data[channel], 51, 3)
+            self.smoothed_data[channel] = savgol_filter(self.scaled_data[channel], 15, 1)
         self.smoothed_data['time_data'] = self.scaled_data['time_data']
             
 
     def extract_period_index_v4(self, s_channel):
-        zero_buffer = 0.007
-        signal_buffer = self.wave_amplitude/5
-        first_zero_index = next((i for i, point in enumerate(self.scaled_data[s_channel]) if point <= zero_buffer), None)
+        self.smoother()
+        zero_buffer = 0.0001
+        signal_buffer = 0.001
+        first_zero_index = next((i for i, point in enumerate(self.smoothed_data[s_channel]) if point <= zero_buffer), None)
         try:
-            first_signal_index = next((i for i, point in enumerate(self.scaled_data[s_channel][first_zero_index:],
+            first_signal_index = next((i for i, point in enumerate(self.smoothed_data[s_channel][first_zero_index:],
                                                                    start=first_zero_index) if point >= signal_buffer), None)
-            end_time_value = self.scaled_data['time_data'][first_signal_index] + self.wave_period
-            second_signal_index = np.where(self.scaled_data["time_data"] >= end_time_value)[0][0]
+            end_time_value = self.smoothed_data['time_data'][first_signal_index] + self.wave_period
+            second_signal_index = np.where(self.smoothed_data["time_data"] >= end_time_value)[0][0]
             return [first_signal_index, second_signal_index]
         except Exception as e:
             print(e)
-            self.visualise(self.scaled_data)
+            self.visualise(self.smoothed_data)
             print("len data: ", len(self.scaled_data[s_channel]))
             exit()
 
@@ -510,19 +511,27 @@ class RIGOL:
             PLUS = np.average(self.cleaned_data[self.channels_dict['+']][third_index:last_index])
             MINUS = np.average(self.cleaned_data[self.channels_dict['-']][third_index:last_index])
             self.pm_qber = MINUS / (PLUS + MINUS)
-            self.qber = self.hv_qber
+
         else:
             third_index = np.where(self.cleaned_data['time_data'] >=
                                    (first_rise_time + second_fall_time))[0][0]
             last_index = np.where(self.cleaned_data['time_data'] >=
                                   (first_rise_time + second_fall_time + second_rise_time))[0][0]
-            H = np.average(self.cleaned_data[self.channels_dict['H']][first_index:second_index])
-            V = np.average(self.cleaned_data[self.channels_dict['V']][first_index:second_index])
+            H = np.average(self.cleaned_data[self.channels_dict['H']][third_index:last_index])
+            V = np.average(self.cleaned_data[self.channels_dict['V']][third_index:last_index])
             self.hv_qber = V / (H + V)
-            PLUS = np.average(self.cleaned_data[self.channels_dict['+']][third_index:last_index])
-            MINUS = np.average(self.cleaned_data[self.channels_dict['-']][third_index:last_index])
+            PLUS = np.average(self.cleaned_data[self.channels_dict['+']][first_index:second_index])
+            MINUS = np.average(self.cleaned_data[self.channels_dict['-']][first_index:second_index])
             self.pm_qber = MINUS / (PLUS + MINUS)
-            self.qber = self.hv_qber
+        if self.hv_qber > 1:
+            self.hv_qber = 1
+        elif self.hv_qber < 0:
+            self.hv_qber = 0
+        if self.pm_qber > 1:
+            self.pm_qber = 1
+        elif self.pm_qber < 0:
+            self.pm_qber = 0
+        self.qber = 1 / np.sqrt(2) * np.sqrt(self.hv_qber**2 + self.pm_qber**2)
 
     def get_data(self, source_channel= 1):
         self.capture()
