@@ -58,15 +58,15 @@ while True:
     #print("live pm_qber: ",acquirer.pm_qber)
     print("live hv_qber: ",acquirer.hv_qber)
     print("QBER: ", acquirer.qber)
-    if acquirer.qber < 0.1:
-        acquirer.visualise(acquirer.cleaned_data)
-        print("type one wave: ", acquirer.discriminator(s_channel= 1))
-        acquirer.visualise(acquirer.smoothed_data)
+    #if acquirer.qber < 0.1:
+    #    acquirer.visualise(acquirer.cleaned_data)
+    #    print("type one wave: ", acquirer.discriminator(s_channel= 1))
+    #    acquirer.visualise(acquirer.smoothed_data)
     if 0.12 < acquirer.qber:
         time.sleep(0.3)
         optimizer.run()
     time.sleep(0.2)
     counter += 1
     if counter % 10 == 0:
-        acquirer.visualise(acquirer.smoothed_data)
-        acquirer.extract_results("new_output.csv")
+        #acquirer.visualise(acquirer.smoothed_data)
+        acquirer.extract_results("new_output3.csv")
