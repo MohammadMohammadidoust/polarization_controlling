@@ -417,6 +417,8 @@ class RIGOL:
 
     def qber_calculator(self, wave_type_one):
         self.unix_time = time.time()
+        hv_qber_holder = self.hv_qber
+        pm_qber_holder = self.pm_qber
         epsilon = 1e-10
         first_rise_time = self.wave_period * self.pduty1
         first_fall_time = self.wave_period * self.nduty1
@@ -442,8 +444,12 @@ class RIGOL:
             V = np.average(self.cleaned_data[self.channels_dict['V']][third_index:last_index])
             PLUS = np.average(self.cleaned_data[self.channels_dict['+']][first_index:second_index])
             MINUS = np.average(self.cleaned_data[self.channels_dict['-']][first_index:second_index])
-        self.hv_qber = np.clip(V / (H + V + epsilon), 0, 1)
-        self.pm_qber = np.clip(MINUS / (PLUS + MINUS + epsilon), 0, 1)
+        self.hv_qber = V / (H + V + epsilon)
+        self.pm_qber = MINUS / (PLUS + MINUS + epsilon)
+        if self.hv_qber >1 or self.hv_qber <0:
+            self.hv_qber = hv_qber_holder
+        if self.pm_qber >1 or self.pm_qber <0:
+            self.pm_qber = pm_qber_holder
         self.qber = (1 / np.sqrt(2)) * np.sqrt(self.hv_qber**2 + self.pm_qber**2)
         logger.debug("Current QBER: {}".format(self.qber))
         
