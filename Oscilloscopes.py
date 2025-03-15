@@ -230,7 +230,7 @@ class OWON:
         self.hv_qber = V / (H + V)
         self.pm_qber = MINUS / (PLUS + MINUS)
         self.qber = (1 / np.sqrt(2)) * np.sqrt(self.hv_qber**2 + self.pm_qber**2)
-        logger.info("Current QBER is: {}".format(self.qber))
+        logger.debug("Current QBER is: {}".format(self.qber))
 
     def get_data(self):
         logger.debug("Start acquiring data")
@@ -323,12 +323,12 @@ class RIGOL:
             self.send(self.configs['scope']['rigol']['commands']['channel_source'].format(channel))
             preamble = self.query(self.configs['scope']['rigol']['queries']['preamble'],
                                   strip= False).split(',')
-            format_type   = int(preamble[0])
-            data_type     = int(preamble[1])
-            um_points    = int(preamble[2])
-            num_avg       = int(preamble[3])
+            #format_type   = int(preamble[0])
+            #data_type     = int(preamble[1])
+            #um_points    = int(preamble[2])
+            #num_avg       = int(preamble[3])
             x_increment   = float(preamble[4])
-            x_origin      = float(preamble[5])
+            #x_origin      = float(preamble[5])
             x_reference   = float(preamble[6])
             y_increment   = float(preamble[7])
             y_origin      = float(preamble[8])
@@ -350,6 +350,8 @@ class RIGOL:
             logger.error("Something went wrong due to capturing data!")
             if attempt < max_attempts:
                 logger.warning(f"Retrying capture (attempt {attempt + 1} of {max_attempts})...")
+                self.send(self.configs['scope']['rigol']['commands']['start_running'])
+                time.sleep(0.1)
                 return self.capture(attempt=attempt + 1, max_attempts=max_attempts)
             else:
                 print("Can not capture data!")
@@ -443,7 +445,7 @@ class RIGOL:
         self.hv_qber = np.clip(V / (H + V + epsilon), 0, 1)
         self.pm_qber = np.clip(MINUS / (PLUS + MINUS + epsilon), 0, 1)
         self.qber = (1 / np.sqrt(2)) * np.sqrt(self.hv_qber**2 + self.pm_qber**2)
-        logger.info("Current QBER: {}".format(self.qber))
+        logger.debug("Current QBER: {}".format(self.qber))
         
     def get_data(self, source_channel= 1):
         self.capture()

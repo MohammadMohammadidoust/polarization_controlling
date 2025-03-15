@@ -1,7 +1,7 @@
 {
     "logging": {
 	"version": 1,
-	"disable_existing_loggers": False,
+	"disable_existing_loggers": false,
 	"formatters": {
 	    "standard": {
 		"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
@@ -14,18 +14,18 @@
 		"filename": "LOG_FILE.log",
 		"maxBytes": 1048576,
 		"backupCount": 3,
-		"level": "DEBUG"
+		"level": "INFO"
             },
 	    "console": {
 		"class": "logging.StreamHandler",
 		"formatter": "standard",
-		"level": "INFO",
+		"level": "WARNING",
 		"stream": "ext://sys.stdout"
             }
 	},
 	"root": {
             "handlers": ["file_handler", "console"],
-            "level": "DEBUG"
+            "level": "INFO"
 	}
     },
     "scope": {

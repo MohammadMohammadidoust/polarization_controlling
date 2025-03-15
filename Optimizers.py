@@ -65,7 +65,7 @@ class PSO(object):
                 current_position = self.position_x[iteration, particle_no, :]
                 current_voltage = current_position.astype(int).tolist()
                 self.p_controller.send_voltages(current_voltage)
-                time.sleep(0.2)
+                time.sleep(0.3)
                 self.p_data_acquisition.update_data(current_voltage)
                 current_qber = self.p_data_acquisition.qber
                 self.qber_values[iteration, particle_no] = current_qber

@@ -1,6 +1,7 @@
 import time
 import json
 import LoggingConfiguration
+import logging
 from Oscilloscopes import RIGOL
 from PolarizationControllers import OzOptics
 from Optimizers import PSO
@@ -60,21 +61,23 @@ print("qber: ",acquirer.qber)
 counter = 0
 logger.info("start running main programme")
 while True:
-    acquirer.get_data(source_channel= 1)
-    #print("live pm_qber: ",acquirer.pm_qber)
-    print("live hv_qber: ",acquirer.hv_qber)
-    print("QBER: ", acquirer.qber)
-    #if acquirer.qber < 0.1:
-    #    acquirer.visualise(acquirer.cleaned_data)
-    #    print("type one wave: ", acquirer.discriminator(s_channel= 1))
-    #    acquirer.visualise(acquirer.smoothed_data)
-    if 0.12 < acquirer.qber:
-        time.sleep(0.3)
-        optimizer.run()
-    time.sleep(0.2)
-    counter += 1
-    if counter % 10 == 0:
-        #acquirer.visualise(acquirer.smoothed_data)
-        acquirer.extract_results("new_output3.csv")
-        
-logger.info("the programme has been finished")
+    try:
+        acquirer.get_data(source_channel= 1)
+        #print("live pm_qber: ",acquirer.pm_qber)
+        #print("live hv_qber: ",acquirer.hv_qber)
+        #if acquirer.qber < 0.1:
+        #    acquirer.visualise(acquirer.cleaned_data)
+        #    print("type one wave: ", acquirer.discriminator(s_channel= 1))
+        #    acquirer.visualise(acquirer.smoothed_data)
+        print("Live QBER: ", acquirer.qber)
+        if 0.12 < acquirer.qber:
+            print("start running optimiser")
+            time.sleep(0.3)
+            optimizer.run()
+        time.sleep(0.2)
+        counter += 1
+        if counter % 10 == 0:
+            #acquirer.visualise(acquirer.cleaned_data)
+            acquirer.extract_results("new_output3.csv")
+    except KeyboardInterrupt:
+        logger.info("the programme has been finished")
