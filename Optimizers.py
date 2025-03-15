@@ -1,5 +1,8 @@
 import numpy as np
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 class PSO(object):
     """
@@ -10,7 +13,8 @@ class PSO(object):
       - Personal best positions and scores for each particle.
       - A global best position and score.
     
-    The evaluation loop is sequential (due to hardware limitations) and the velocity/position updates are vectorized.
+    The evaluation loop is sequential (due to hardware limitations) 
+    and the velocity/position updates are vectorized.
     """
     
     def __init__(self, conf_dict, acquire_polarization_instance, polarization_controller_instance):
@@ -45,12 +49,16 @@ class PSO(object):
         self.best_global_score = self.configs['optimizer']['pso']['qber_best_best']
         if self.learning_mode == "independent_learning":
             self.best_global_position = self.configs['optimizer']['pso']['voltage_best_best']
+        logger.debug("Resetting PSO initial state done in mode {}.".format(self.learning_mode))
     
     def run(self):
+        logger.info("Start running PSO optimiser")
         self.reset_state()
         begin_time = time.perf_counter()
-        self.position_x[0] = np.random.randint(self.min_x, self.max_x, (self.max_particles, self.dimensions))
-        self.velocity[0] = np.random.randint(self.min_x, self.max_x, (self.max_particles, self.dimensions))
+        self.position_x[0] = np.random.randint(self.min_x, self.max_x,
+                                               (self.max_particles, self.dimensions))
+        self.velocity[0] = np.random.randint(self.min_x, self.max_x,
+                                             (self.max_particles, self.dimensions))
         self.personal_best_positions = self.position_x[0].copy()
         for iteration in range(self.max_iteration - 1):
             for particle_no in range(self.max_particles):
@@ -71,7 +79,8 @@ class PSO(object):
                     final_voltage = self.best_global_position.astype(int).tolist()
                     self.p_controller.send_voltages(final_voltage)
                     total_time = time.perf_counter() - begin_time
-                    print(f"Optimization finished at iteration {iteration} with total time: {total_time:.2f}s")
+                    logger.info(f"Optimization finished at \
+                    iteration {iteration} with total time: {total_time:.2f}s")
                     return
             r1 = np.random.rand(self.max_particles, self.dimensions)
             r2 = np.random.rand(self.max_particles, self.dimensions)
@@ -82,10 +91,10 @@ class PSO(object):
             new_position = np.clip(new_position, self.min_x, self.max_x)
             self.velocity[iteration + 1] = new_velocity
             self.position_x[iteration + 1] = new_position
-            print(f"Current QBER in iteration {iteration}: {self.p_data_acquisition.qber}")        
-        print("Optimization finished without reaching the threshold.")
+            logger.debug(f"Current QBER in iteration {iteration}: {self.p_data_acquisition.qber}")        
+        logger.debug("Optimization finished without reaching the threshold.")
         total_time = time.perf_counter() - begin_time
-        print(f"Total time: {total_time:.2f}s")
+        logger.debug(f"Total time: {total_time:.2f}s")
 
 
 class SimulatedAnnealing():
@@ -104,6 +113,7 @@ class SimulatedAnnealing():
         self.best = [0,0,0,0]
 
         def run():
+            logger.info("Start running SA optimiser")
             self.p_controller.send_voltages(self.best)
             self.p_data_acquisition.update_data(self.best)
             best_eval = self.p_data_acquisition.qber

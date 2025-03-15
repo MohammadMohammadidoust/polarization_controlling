@@ -1,4 +1,33 @@
 {
+    "logging": {
+	"version": 1,
+	"disable_existing_loggers": False,
+	"formatters": {
+	    "standard": {
+		"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+	    }
+	},
+	"handlers": {
+            "file_handler": {
+		"class": "logging.handlers.RotatingFileHandler",
+		"formatter": "standard",
+		"filename": "LOG_FILE.log",
+		"maxBytes": 1048576,
+		"backupCount": 3,
+		"level": "DEBUG"
+            },
+	    "console": {
+		"class": "logging.StreamHandler",
+		"formatter": "standard",
+		"level": "INFO",
+		"stream": "ext://sys.stdout"
+            }
+	},
+	"root": {
+            "handlers": ["file_handler", "console"],
+            "level": "DEBUG"
+	}
+    },
     "scope": {
 	"owon": {
 	    "resource_address": "USB0::0x5345::0x1235::2052231::INSTR",
@@ -165,6 +194,3 @@
 	}
     }
 }
-	    
-	    
-	

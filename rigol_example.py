@@ -1,5 +1,6 @@
 import time
 import json
+import LoggingConfiguration
 from Oscilloscopes import RIGOL
 from PolarizationControllers import OzOptics
 from Optimizers import PSO
@@ -9,9 +10,13 @@ CONFIG_FILE = "CONFIG.json"
 with open (CONFIG_FILE, 'r') as j_file:
     CONFIGS = json.load(j_file)
 
+LoggingConfiguration.configure_logging(CONFIGS["logging"])
+logger = logging.getLogger("main")
+
 
 def scope_configuration(brand= "RIGOL", auto_set= False, source_channel= 1):
     scope = RIGOL(CONFIGS)
+    logger.debug("scope with address {} start configuring".format(scope.resource_address))
     print("Scope Address: ", scope.resource_address)
     if auto_set:
         scope.auto_set_device()
@@ -53,6 +58,7 @@ print("qber: ",acquirer.qber)
 
 
 counter = 0
+logger.info("start running main programme")
 while True:
     acquirer.get_data(source_channel= 1)
     #print("live pm_qber: ",acquirer.pm_qber)
@@ -70,3 +76,5 @@ while True:
     if counter % 10 == 0:
         #acquirer.visualise(acquirer.smoothed_data)
         acquirer.extract_results("new_output3.csv")
+        
+logger.info("the programme has been finished")

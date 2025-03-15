@@ -1,4 +1,7 @@
 import serial
+import logging
+
+logger = logging.getLogger(__name__)
 
 class OzOptics(object):
     def __init__(self, conf_dict):
@@ -10,9 +13,10 @@ class OzOptics(object):
     def connect(self):
         try:
             self.device = serial.Serial(self.port, self.baudrate, timeout= self.timeout)
-            print("OzOptics connected successfully!")
+            logger.info("OzOptics connected successfully!")
         except:
-            print("OzOptics connection failed")
+            logger.critical("OzOptics connection failed")
+            exit()
 
     def send_voltages(self, volts):
         if self.device.isOpen():
@@ -21,5 +25,6 @@ class OzOptics(object):
             self.device.write(("V3,"+str(int(volts[2]))+"\r\n").encode('ascii'))
             self.device.write(("V4,"+str(int(volts[3]))+"\r\n").encode('ascii'))
         else:
-            print("Polarization Controller is not open!")
+            logger.critical("Polarization Controller is not open!")
+            exit()
 

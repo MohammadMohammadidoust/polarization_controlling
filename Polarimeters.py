@@ -1,9 +1,10 @@
 import pyvisa
 import serial
+import logging
 import numpy as np
 import pandas as pd
 
-
+logger = logging.getLogger(__name__)
 
 class Thorlabs(object):
     def __init__(self, conf_dict):
@@ -19,13 +20,14 @@ class Thorlabs(object):
     def connect(self):
         rm = pyvisa.ResourceManager()
         self.device = rm.open_resource(self.resource_address)
-        print("polarimeter connected: ", self.device.query('*IDN?'))
+        logger.info("polarimeter connected: {}".format(self.device.query('*IDN?')))
         self.device.write('{};:{};:{}'.format(self.mode, self.motor_on, self.motor_speed))
-        print("Plarimeter Wavelength(m):", self.device.query(self.configs['polarimeter']['thorlabs']['queries']['wavelength']))
-        print("Plarimeter Mode:", self.device.query(self.configs['polarimeter']['thorlabs']['queries']['mode']))
-        print("Plarimeter Motor Speed(Hz):", self.device.query(self.configs['polarimeter']['thorlabs']['queries']['speed']))        
+        print("Plarimeter Wavelength(m): {}".format(self.device.query(self.configs['polarimeter']['thorlabs']['queries']['wavelength'])))
+        print("Plarimeter Mode: {}".format(self.device.query(self.configs['polarimeter']['thorlabs']['queries']['mode'])))
+        print("Plarimeter Motor Speed(Hz): {}".format(self.device.query(self.configs['polarimeter']['thorlabs']['queries']['speed'])))
         
     def get_data(self):
+        logger.debug("Start getting data from ThorLabs")
         data = list(map(float, self.device.query(self.configs['polarimeter']['thorlabs']['queries']['acquire_data']).split(",")))
         timestamp = data[1]
         mode = data[2]
@@ -40,6 +42,7 @@ class Thorlabs(object):
         self.s3 = np.sin(2*Chi)
         self.unix_time = time.time()
         self.qber = (1 + self.s1)/2
+        logger.info("Current QBER: {}".fromat(self.qber))
                 
     def update_data(self, additional_data):
         self.get_data()
@@ -50,5 +53,6 @@ class Thorlabs(object):
             self.result_dict[key].append(element)
             
     def extract_results(self, output_name):
+        logger.debug("Updated data has been written successfully!")
         df = pd.DataFrame(self.result_dict)
         df.to_csv(output_name, sep= ',')
