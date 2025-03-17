@@ -236,7 +236,7 @@ class OWON:
         logger.debug("Start acquiring data")
         self.capture()
         self.calculate_voltage_and_time()
-        test_wave_form = self.scaled_data[2]
+        test_wave_form = self.scaled_data[2].copy()
         i_index, f_index = self.extract_period_index_v4(test_wave_form)
         self.clean_wave_form_data(i_index, f_index)
         self.qber_calculator()
@@ -380,8 +380,8 @@ class RIGOL:
     def smoother(self):
         self.smoothed_data = {}
         for channel in self.channels:
-            self.smoothed_data[channel] = savgol_filter(self.scaled_data[channel], 15, 1)
-        self.smoothed_data['time_data'] = self.scaled_data['time_data']
+            self.smoothed_data[channel] = savgol_filter(self.scaled_data[channel].copy(), 15, 1)
+        self.smoothed_data['time_data'] = self.scaled_data['time_data'].copy()
             
     def extract_period_index_v4(self, s_channel):
         self.smoother()
