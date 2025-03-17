@@ -1,44 +1,101 @@
 # polarization_controlling
-pure python APIs aim to handle polarization fluctuations in an optic setup
 
-Photon polarisation plays a key role in most Quntum and classical photonic applications.
-As an instance of its usage, in many quantum cryptography protocols, photon polarization is measured between sender and reciever sides (known as Alice and Bob) to make an agreement on a key.
+**Pure Python APIs for Real-Time Polarization Control in Optical Setups**
 
-However, due to some effects such as instruments imperfections, birefringence phenomena and thermal fluctuations, the polarization of photon could be changed as time passes through a fiber.
-for many reasons, it maybe important to modify the polarisation to a certain value. to achieve this goal many instruments known as polarisation controllers have been created. these devices uses various methods, like manual dynamic ones to electrical ones that using Piezoelectrics, to adjust light polarisation into an arbitrary value by squeezing the fiber.
+---
 
-some new polarisation controllers are developed to track polarization and give feedback to the fiber online to achieve somehow "Endless Polarisation controlling".
-(e.g https://opg.optica.org/oe/fulltext.cfm?uri=oe-22-7-8259&id=282433 and https://digital-library.theiet.org/doi/abs/10.1049/el.2011.1522)
+## Overview
 
-the main goal of development of these codes is also to give feedback from the fiber quickly and modify the polarisation by using a simple electrical polarisation controller.
+**polarization_controlling** is a Python toolkit designed to monitor and stabilize photon polarization in optical systems. It plays an essential role in quantum cryptography and classical photonic applications by ensuring that the desired polarization state is maintained—even in the face of inherent system imperfections such as instrument errors, birefringence, and thermal fluctuations.
 
+In many quantum cryptography protocols (e.g., those involving the well-known Alice and Bob scenario), the polarization states of photons are used to generate secure keys. Any deviation from the intended state introduces errors, quantified as the **Quantum Bit Error Rate (QBER)**. Our API suite helps to quickly detect these deviations via integrated measurement devices and applies corrective feedback using electrical polarization controllers.
 
-to investigate the whole process, rather than using two laser devices, some beam splitters and polarization beam splitters, detectors, optical fibers and attenuators, we utilised an Oscilloscope to measure Polarization in a given fiber, An Electrical polarization controller to send different voltages to squeeze the fiber and a Polarimeter to acquire light polarizations directly.
-former instruments are controlled by this code via a computer.
+---
 
-we implemented a prepare-and-mesure opticl setup to test the code efficiency. the light starts to emmit with a certain polarization in a one side and in the receiver side it should be the same as emitted. In Quantum cryptography context, any difference from the initial polarisation is described as Quantum Bit Error Rate (QBER).
+## Key Features
 
-in an ideal fiber the polarisation of emmited light should remain steady (with very minor fluctuations) over time. this stated means there is no Error rate in a Quantum Key distribution device ( which uses light polarisation as a quantum source of key agreement).
+- **Real-Time Monitoring:**  
+  Continuously tracks polarization using devices like oscilloscopes and polarimeters to assess system performance and QBER.
 
-but in normal condition, polarization slightly drifts over time and QBER reaches a certain threshold.
-one of the main parts of the code is to monitor the the polarization (and subsequently QBER) continuesly through an oscilloscope or polarimeter.
+- **Automated Correction:**  
+  Once the QBER exceeds a predefined threshold, the system calculates and applies optimal voltage adjustments to the fiber via a polarization controller.
 
-having crossed the threshold, the polarisation controller should begin to apply pressure on fiber to subside the increased QBER.
+- **Advanced Optimization Algorithms:**  
+  Integrated optimizers based on Particle Swarm Optimization (PSO) and Simulated Annealing (SA) reduce correction times and maintain system stability.
 
-the key role in this part is to develop an optimiser code to find the optimal value of applying voltages. this lead to decrease time of correction process.
+- **Modular and Extensible:**  
+  Designed with flexibility in mind, the APIs can easily accommodate new instruments or optimization methods, making them useful beyond polarization control applications.
 
-in our experiment we developed this code to deal with these devices:
+---
 
-Polarimeter: ThorLabs PAX1000IR2
-Polarisation controller: OZ Optics 4 channels EPC Polarisation controller with USB Driver
-Oscilloscopes: OWON VDS6047 PC Oscilloscope
-	       RIGOL DS 6104 Oscilloscope
+## Experimental Setup
 
-Moreover we have developed Particle Swarm Optimisation (PSO) and Simulated Annealing (SA) algorithms to optimise the error correction time in high QBER regimes.
+Instead of assembling a complex array of lasers, beam splitters, and detectors, our experimental prototype leverages a simplified yet highly effective configuration:
+  
+- **Measurement:**  
+  An **Oscilloscope** measures the dynamic polarization fluctuations in the fiber.  
+- **Adjustment:**  
+  An **Electrical Polarization Controller** applies precise voltage changes to “squeeze” the fiber and restore the desired polarization state.
+- **Verification:**  
+  A **Polarimeter** acquires the light's polarization directly, providing essential feedback for continuous adjustment.
 
+**How It Works:**  
+The system initiates with light of a certain polarization from the transmitter. At the receiver side, it is expected that the polarization remains unchanged. In practice, any drift (due to imperfect components and environmental factors) is detected as an increased QBER. By implementing a prepare-and-measure configuration, the code continuously monitors for errors and, if necessary, automatically adjusts the polarization controller to correct the drift.
 
-the code is designed to easily implement and develop any other instruments or optimisers.
-Beside's I think APIs developed for instruments might me useful for other intentions if anyone wants to use with those devices.
+---
 
+## Supported Hardware
 
-I hope this code would be useful for even one person who wants to use it scientific purposes.
+The project has been tested with the following instruments:
+
+- **Polarimeter:**  
+  *ThorLabs PAX1000IR2*  
+  ![ThorLabs PAX1000IR2](images/ThorLabs_PAX1000IR2.png)  
+  *(Replace with an actual image of your device)*
+
+- **Polarization Controller:**  
+  *OZ Optics 4-Channel EPC Polarization Controller with USB Driver*  
+  ![OZ Optics EPC](images/OZ_Optics_EPC.png)  
+  *(Replace with an actual image of your device)*
+
+- **Oscilloscopes:**  
+  - *OWON VDS6047 PC Oscilloscope*  
+    ![OWON VDS6047](images/OWON_VDS6047.png)  
+    *(Replace with an actual image of your device)*  
+  - *RIGOL DS 6104 Oscilloscope*  
+    ![RIGOL DS 6104](images/RIGOL_DS6104.png)  
+    *(Replace with an actual image of your device)*
+
+These instruments are interfaced and controlled via our Python APIs, allowing streamlined integration into your measurement or experimental setups.
+
+---
+
+## Getting Started
+
+1. **Installation:**  
+   Clone the repository and install the required Python packages:
+   ```bash
+   git clone https://github.com/your_username/polarization_controlling.git
+   cd polarization_controlling
+   pip install -r requirements.txt
+
+---
+
+## Usage Example
+Check out the examples directory for scripts demonstrating:
+-  Initialization of measurement devices.
+-  Real-time QBER monitoring.
+-  Feedback control using automated optimizers.
+
+---
+
+## Contributing
+Contributions are highly welcome! Whether you’re reporting issues, suggesting improvements, or submitting pull requests, your input is invaluable. 
+Please review our CONTRIBUTING.md for detailed contribution guidelines and best practices.
+
+---
+
+## References
+ - [Optical polarization controllers for endless polarization control](https://opg.optica.org/oe/fulltext.cfm?uri=oe-22-7-8259&id=282433)    
+  - [Electrical polarization control in optical fibres](https://digital-library.theiet.org/doi/abs/10.1049/el.2011.1522)  
+
