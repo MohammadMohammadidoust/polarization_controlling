@@ -50,21 +50,21 @@ The project has been tested with the following instruments:
 
 - **Polarimeter:**  
   *ThorLabs PAX1000IR2*  
-  ![ThorLabs PAX1000IR2](images/ThorLabs_PAX1000IR2.png)  
-  *(Replace with an actual image of your device)*
+  ![ThorLabs PAX1000IR2](images/Thorlabs_PAX1000IR2.jpg)  
+
 
 - **Polarization Controller:**  
   *OZ Optics 4-Channel EPC Polarization Controller with USB Driver*  
-  ![OZ Optics EPC](images/OZ_Optics_EPC.png)  
-  *(Replace with an actual image of your device)*
+  ![OZ Optics EPC](images/EPCDriver04ChannelUSB.jpg)  
+
 
 - **Oscilloscopes:**  
   - *OWON VDS6047 PC Oscilloscope*  
-    ![OWON VDS6047](images/OWON_VDS6047.png)  
-    *(Replace with an actual image of your device)*  
+    ![OWON VDS6047](images/OWON_VDS6074.webp)  
+
   - *RIGOL DS 6104 Oscilloscope*  
-    ![RIGOL DS 6104](images/RIGOL_DS6104.png)  
-    *(Replace with an actual image of your device)*
+    ![RIGOL DS 6104](images/RIGOL_ds6104.jpg)  
+
 
 These instruments are interfaced and controlled via our Python APIs, allowing streamlined integration into your measurement or experimental setups.
 
