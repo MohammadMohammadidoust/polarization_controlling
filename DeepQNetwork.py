@@ -1,7 +1,4 @@
 import logging
-import pyvisa
-import serial
-import pandas as pd
 import numpy as np
 import time
 from keras.layers import Dense, Activation
@@ -10,113 +7,73 @@ from keras.optimizers import Adam
 import tensorflow as tf
 import tensorflow.keras as keras
 from tensorflow.keras.optimizers import Adam
-import hashlib
-import datetime
-import sys
+
+
+def build_dqn(lr, n_actions, input_dims, fc1_dims, fc2_dims):
+    model = Sequential([
+                Dense(fc1_dims, input_shape=(input_dims,)),
+                Activation('relu'),
+                Dense(fc2_dims),
+                Activation('relu'),
+                Dense(n_actions)])
+    model.compile(optimizer=Adam(learning_rate=lr), loss='mse')
+    return model
 
 
 class Environment():
-    def __init__(self, conf_dict, acquire_polarization_instance, polarization_controller_instance):
-        self.configs = conf_dict
-        self.all_actions= {0: "ZZZZ", 1: "ZZZU", 2: "ZZZD", 3: "ZZUZ", 4: "ZZDZ",
-                           5: "ZUZZ", 6: "ZDZZ", 7: "UZZZ", 8: "DZZZ", 9: "ZZUU",
-                           10: "ZZDD", 11: "ZZUD", 12: "ZZDU", 13: "ZUZU",
-                           14: "ZDZD", 15: "ZUZD", 16: "ZDZU", 17: "UZZU",
-                           18: "DZZD", 19: "UZZD", 20: "DZZU", 21: "ZUUZ",
-                           22: "ZDDZ", 23: "ZUDZ", 24: "ZDUZ", 25: "UZUZ",
-                           26: "DZDZ", 27: "UZDZ", 28: "DZUZ", 29: "UUZZ",
-                           30: "DDZZ", 31: "UDZZ", 32: "DUZZ", 33: "ZUUU",
-                           34: "ZDDD", 35: "ZUUD", 36: "ZUDU", 37: "ZDUU",
-                           38: "ZDDU", 39: "ZDUD", 40: "ZUDD", 41: "UUUZ",
-                           42: "DDDZ", 43: "UUDZ", 44: "UDUZ", 45: "DUUZ",
-                           46: "DDUZ", 47: "DUDZ", 48: "UDDZ", 49: "UZUU",
-                           50: "DZDD", 51: "UZUD", 52: "UZDU", 53: "DZUU",
-                           54: "DZDU", 55: "DZUD", 56: "UZDD", 57: "UUZU",
-                           58: "DDZD", 59: "UUZD", 60: "UDZU", 61: "DUZU",
-                           62: "DDZU", 63: "DUZD", 64: "UDZD", 65: "UUUU",
-                           66: "DDDD", 67: "UUUD", 68: "UUDU", 69: "UDUU",
-                           70: "DUUU", 71: "UUDD", 72: "DDUU", 73: "UDUD",
-                           74: "DUDU", 75: "DUUD", 76: "UDDU", 77: "DDDU",
-                           78: "DDUD", 79: "DUDD", 80: "UDDD" }
+    def __init__(self, actions_space, acquire_polarization_instance,
+                 polarization_controller_instance, qber_threshold):
+        self.all_actions= actions_space
         self.action_indices= list(self.all_actions.keys())
-        self.current_state= STATE
-        self.terminal_condition= QBER_threshold          # finishing state
-        self.data_dict = {"S1": [], "S2": [], "S3": [], "AZ": [], "ELIP": [],
-                          "unix_time": []}
-        self.output_name = outputfile
-        for _ in range(self.shocker_number):
-            self.shockers.append(Shocker())
-
-    def update_state(self):
-        inputs = Acquire_Data()
-        self.current_state = inputs[0:3]
-        for key, element in zip(self.data_dict.keys(), inputs):
-            self.data_dict[key].append(element)
-
-    def send_voltages(self):
-        voltages= [shocker.voltage for shocker in self.shockers]
-        if Polarization_Controller.isOpen():
-            Polarization_Controller.write(("V1,"+str(int(voltages[0]))+"\r\n").encode('ascii'))
-            Polarization_Controller.write(("V2,"+str(int(voltages[1]))+"\r\n").encode('ascii'))
-            Polarization_Controller.write(("V3,"+str(int(voltages[2]))+"\r\n").encode('ascii'))
-            Polarization_Controller.write(("V4,"+str(int(voltages[3]))+"\r\n").encode('ascii'))
-        else:
-            print("Polarization Controler is not open")
-
-    def turn_off_shockers(self):
-        for shocker in self.shockers:
-            shocker.voltage= 0
-
-    def extract_data(self):
-        df = pd.DataFrame(self.data_dict)
-        df.to_csv(self.output_name, sep= ',')
+        self.p_data_acquisition = acquire_polarization_instance
+        self.p_controller = polarization_controller_instance
+        #self.current_state= STATE
+        self.terminal_condition= qber_threshold
 
     def translate_actions(self, action_index):
         action_string= self.all_actions[action_index]
         return list(action_string)
 
-    def calculate_reward(self, state, boundry_condition):
-        ### Reward system is designed based on distance between current state and
-        ### our expected state. I will punish agent in each step based on this
-        ### distance and if agent finds expected state it gives a +10 points reward
-        ### if agent tries to cross voltage treshold, it'll give a -2000 punish
-        qber= QBER(state)
-        if boundry_condition is True:
+    def calculate_reward(self, boundry_condition):
+        """
+        Reward system is designed based on distance between current state and
+        our expected state. I will punish agent in each step based on this
+        distance and if agent finds expected state it gives a +10 points reward
+        if agent tries to cross voltage treshold, it'll give a -2000 punish
+
+        """
+        
+        if boundry_condition:
             return (-2000, True)                             #reward and done status
-        if qber < self.terminal_condition:
-            return (10.0, True)                             #reward and done status
-        return (-2*(qber - self.terminal_condition), False)  #reward and done status
+        if self.p_data_acquisition.qber < self.terminal_condition:
+            return (10.0, True)
+        return (-2*(self.p_data_acquisition.qber - self.terminal_condition), False)
 
     def check_boundry_conditions(self, action):
-        acts= self.translate_actions(action)
-        for i in range(len(acts)):
-            if ((self.shockers[i].voltage >= self.shockers[i].max_voltage and
-                 acts[i] != 'D') or
-                (self.shockers[i].voltage <= self.shockers[i].min_voltage and
-                 acts[i] != 'U')):
-                return True
-            return False
+        acts = self.translate_actions(action)
+        return any(
+            (volt >= self.p_controller.max_voltage and act != 'D') or
+            (volt <= self.p_controller.min_voltage and act != 'U')
+            for volt, act in zip(self.p_controller.current_voltages, acts)
+            )
 
     def step(self, action):
-        boundry= self.check_boundry_conditions(action)
+        boundry = self.check_boundry_conditions(action)
         if boundry:
-            reward, done= self.calculate_reward(self.current_state, boundry_condition= True)
-            for shock in (self.shockers):
-                shock.reset_voltage()
-            self.send_voltages()
-            return (self.current_state, reward, done)
+            reward, done= self.calculate_reward(boundry_condition= True)
+            self.p_controller.reset_voltages()
+            return (self.p_data_acquisition.qber, reward, done)
         else:
-            acts= self.translate_actions(action)
-            for i, shock in enumerate(self.shockers):
-                shock.update_voltage(acts[i])
-            self.send_voltages()
+            acts = self.translate_actions(action)
+            new_voltages = self.p_controller.action_to_voltages(acts)
+            self.p_controller.send_voltages(new_voltages)
             time.sleep(0.3)         #response time
-            self.update_state()
-            reward, done= self.calculate_reward(self.current_state, boundry_condition= False)
-            return (np.array([self.current_state]), reward, done)
+            self.p_data_acquisition.update_data(new_voltages)
+            reward, done= self.calculate_reward(boundry_condition= False)
+            return (np.array([self.p_data_acquisition.qber]), reward, done)
 
 class ReplayBuffer(object):
-    def __init__(self, max_size, input_shape, n_actions, discrete=False):
+    def __init__(self, max_size, input_shape, n_actions, discrete= False):
         self.mem_size = max_size
         self.mem_cntr = 0
         self.discrete = discrete
@@ -155,9 +112,9 @@ class ReplayBuffer(object):
         return states, actions, rewards, states_, terminal
 
 class Agent(object):
-    def __init__(self, alpha, gamma, n_actions, epsilon, batch_size,
+    def __init__(self, alpha, gamma, n_actions, discrete, epsilon, batch_size,
                  input_dims, epsilon_dec=0.996,  epsilon_end=0.01,
-                 mem_size=1000000, fname='dqn_model.h5'):
+                 fc1_dims= 256, fc2_dims= 256, mem_size=1000000, fname='dqn_model.h5'):
         self.action_space = [i for i in range(n_actions)]
         self.gamma = gamma
         self.epsilon = epsilon
@@ -165,9 +122,8 @@ class Agent(object):
         self.epsilon_min = epsilon_end
         self.batch_size = batch_size
         self.model_file = fname
-        self.memory = ReplayBuffer(mem_size, input_dims, n_actions,
-                                   discrete=True)
-        self.q_eval = build_dqn(alpha, n_actions, input_dims, 256, 256)
+        self.memory = ReplayBuffer(mem_size, input_dims, n_actions, discrete)
+        self.q_eval = build_dqn(alpha, n_actions, input_dims, fc1_dims, fc2_dims)
 
     def remember(self, state, action, reward, new_state, done):
         self.memory.store_transition(state, action, reward, new_state, done)

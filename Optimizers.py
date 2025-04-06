@@ -1,6 +1,7 @@
-import numpy as np
 import time
 import logging
+import numpy as np
+from DeepQNetwork import *
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +21,7 @@ class PSO(object):
     def __init__(self, conf_dict, acquire_polarization_instance, polarization_controller_instance):
         self.configs = conf_dict
         self.learning_mode = self.configs['optimizer']['pso']['learning_mode']
-        self.threshold = self.configs['optimizer']['pso']['qber_threshold']
+        self.threshold = self.configs['optimizer']['qber_threshold']
         self.min_x = self.configs['optimizer']['pso']['min_x']
         self.max_x = self.configs['optimizer']['pso']['max_x']
         self.max_particles = self.configs['optimizer']['pso']['max_particles']
@@ -100,14 +101,14 @@ class PSO(object):
 class SimulatedAnnealing():
     def __init__(self, conf_dict, acquire_polarization_instance, polarization_controller_instance):
         self.configs = conf_dict
-        self.threshold = self.configs['optimizer']['sm']['qber_threshold']
-        self.dimensions = self.configs['optimizer']['sm']['dimensions']
-        self.bounds = self.configs['optimizer']['sm']['bounds']
-        self.n_iterations = self.configs['optimizer']['sm']['n_iterations']
-        self.step_size = self.configs['optimizer']['sm']['step_size']
-        self.temp = self.configs['optimizer']['sm']['temp']
-        self.low = self.configs['optimizer']['sm']['low']
-        self.high = self.configs['optimizer']['sm']['high']
+        self.threshold = self.configs['optimizer']['qber_threshold']
+        self.dimensions = self.configs['optimizer']['sa']['dimensions']
+        self.bounds = self.configs['optimizer']['sa']['bounds']
+        self.n_iterations = self.configs['optimizer']['sa']['n_iterations']
+        self.step_size = self.configs['optimizer']['sa']['step_size']
+        self.temp = self.configs['optimizer']['sa']['temp']
+        self.low = self.configs['optimizer']['sa']['low']
+        self.high = self.configs['optimizer']['sa']['high']
         self.p_controller = polarization_controller_instance
         self.p_data_acquisition = acquire_polarization_instance
         self.best = [0,0,0,0]
@@ -145,3 +146,53 @@ class SimulatedAnnealing():
                 if diff < 0 or np.random.rand() < metropolis:
                     curr, curr_eval = candidate, candidate_eval
             return [best, best_eval, scores]
+
+
+
+class DQN():
+    def __init__(self, conf_dict, acquire_polarization_instance, polarization_controller_instance):
+        self.configs = conf_dict
+        self.total_runs = self.configs['optimizer']['dqn']['totoal_runs']
+        self.episode = 0
+        self.scores = []
+        self.all_actions = self.configs['optimizer']['dqn']['all_actions']
+        self.qber_threshold = self.configs['optimizer']['dqn']['qber_threshold']
+        self.mem_size = self.configs['optimizer']['dqn']['memory_size']
+        self.discrete = self.configs['optimizer']['dqn']['discrete_actions_space']
+        self.input_dims = self.configs['optimizer']['dqn']['input_dims']
+        self.n_actions = self.configs['optimizer']['dqn']['n_actions']
+        self.learning_rate = self.configs['optimizer']['dqn']['learning_rate']
+        self.fc1_dims = self.configs['optimizer']['dqn']['fc1_dims']
+        self.fc2_dims = self.configs['optimizer']['dqn']['fc2_dims']
+        self.gamma = self.configs['optimizer']['dqn']['gamma']
+        self.epsilon = self.configs['optimizer']['dqn']['epsilon']
+        self.epsilon_dec = self.configs['optimizer']['dqn']['epsilon_dec']
+        self.epsilon_end = self.configs['optimizer']['dqn']['epsilon_end']
+        self.batch_size = self.configs['optimizer']['dqn']['batch_size']
+        self.model_file = self.configs['optimizer']['dqn']['fname']
+        self.env = Environment(self.all_actions, acquire_polarization_instance,
+                               polarization_controller_instance, self.qber_threshold)
+        self.agent = Agent(self.learning_rate, self.gamma, self.n_actions, self.discrete,
+                           self.epsilon, self.batch_size, self.input_dims, self.epsilon_dec,
+                           self.epsilon_end, self.fc1_dims, self.fc2_dims, self.mem_size,
+                           self.model_file)
+
+        def run(self):
+            self.env.p_data_acquisition.update_data(self.env.p_controller.current_voltages)
+            observation = self.env.p_data_acquisition.qber
+            done = False
+            score = 0
+            while not done:
+                action = self.agent.choose_action(observation)
+                observation_, reward, done= self.env.step(action)
+                score += reward
+                self.agent.remember(observation, action, reward, observation_, int(done))
+                observation = observation_
+                self.agent.learn()
+            self.scores.append(score)
+            self.episode += 1
+            if self.episode % 50 == 0:
+                self.agent.save_model()
+            
+                
+                

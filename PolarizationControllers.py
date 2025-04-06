@@ -7,11 +7,13 @@ class OzOptics(object):
     def __init__(self, conf_dict):
         self.configs = conf_dict
         self.start_voltage = np.array(self.configs['p_controller']['ozoptics']['initial_state'])
-        self.voltage = np.array(self.configs['p_controller']['ozoptics']['initial_state'])
+        self.current_voltages = np.array(self.configs['p_controller']['ozoptics']['initial_state'])
         self.step = self.configs['p_controller']['ozoptics']['step_size']
         self.port = self.configs['p_controller']['ozoptics']['port']
         self.baudrate = self.configs['p_controller']['ozoptics']['baudrate']
         self.timeout = self.configs['p_controller']['ozoptics']['timeout']
+        self.min_voltage = self.configs['p_controller']['ozoptics']['min_voltage']
+        self.max_voltage = self.configs['p_controller']['ozoptics']['max_voltage']
 
     def connect(self):
         try:
@@ -22,7 +24,7 @@ class OzOptics(object):
             exit()
 
     def update_voltages(self, volts):
-        self.voltage = volts
+        self.current_voltages = volts
 
     def send_voltages(self, volts):
         self.update_voltages(volts)
@@ -38,8 +40,8 @@ class OzOptics(object):
     def reset_voltages(self):
         self.send_voltages([0, 0, 0, 0])
 
-    def translate_actions(self, actions):
-    new_voltages = self.voltage.copy()  
+    def action_to_voltages(self, actions):
+    new_voltages = self.current_voltages.copy()  
     mapping = {"U": self.step, "D": -self.step}
     for i, action in enumerate(actions):
         new_voltages[i] += mapping.get(action, 0)
