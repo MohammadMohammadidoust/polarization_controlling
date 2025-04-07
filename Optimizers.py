@@ -50,7 +50,7 @@ class PSO(object):
         self.best_global_score = self.configs['optimizer']['pso']['qber_best_best']
         if self.learning_mode == "independent_learning":
             self.best_global_position = self.configs['optimizer']['pso']['voltage_best_best']
-        logger.debug("Resetting PSO initial state done in mode {}.".format(self.learning_mode))
+        logger.debug(f"Resetting PSO initial state done in mode {self.learning_mode}.")
     
     def run(self):
         logger.info("Start running PSO optimiser")
@@ -113,46 +113,46 @@ class SimulatedAnnealing():
         self.p_data_acquisition = acquire_polarization_instance
         self.best = [0,0,0,0]
 
-        def run():
-            logger.info("Start running SA optimiser")
+    def run():
+        logger.info("Start running SA optimiser")
+        self.p_controller.send_voltages(self.best)
+        self.p_data_acquisition.update_data(self.best)
+        best_eval = self.p_data_acquisition.qber
+        while best_eval > self.threshold:
+            for dimension in range(self.dimensions):
+                best[dimension] = np.random.randint(low= self.low, high= self.high)
             self.p_controller.send_voltages(self.best)
+            time.sleep(0.2)
             self.p_data_acquisition.update_data(self.best)
             best_eval = self.p_data_acquisition.qber
-            while best_eval > self.threshold:
-                for dimension in range(self.dimensions):
-                    best[dimension] = np.random.randint(low= self.low, high= self.high)
-                self.p_controller.send_voltages(self.best)
-                time.sleep(0.2)
-                self.p_data_acquisition.update_data(self.best)
-                best_eval = self.p_data_acquisition.qber
-            curr, curr_eval = best, best_eval
-            scores = []
-            for i in range(self.n_iterations):
-                candidate = curr + np.random.choice([-1, -0.7, -0.5, -0.3, 0, 0.3, 0.5, 0.7, 1],
-                                                    size=len(self.bounds)) * self.step_size
-                self.p_controller.send_voltages(candidate)
-                time.sleep(0.2)
-                self.p_data_acquisition.update_data(self.best)
-                candidate_eval = self.p_data_acquisition.qber
-                if candidate_eval < best_eval:
-                    best, best_eval = candidate, candidate_eval
-                    scores.append(best_eval)
-                    print('>%d QBER(%s) = %.5f' % (i, best, best_eval))
-                if best_eval < self.threshold:
-                    break
-                diff = candidate_eval - curr_eval
-                t = temp / float(i + 1)
-                metropolis = np.exp(-diff / t)
-                if diff < 0 or np.random.rand() < metropolis:
-                    curr, curr_eval = candidate, candidate_eval
-            return [best, best_eval, scores]
+        curr, curr_eval = best, best_eval
+        scores = []
+        for i in range(self.n_iterations):
+            candidate = curr + np.random.choice([-1, -0.7, -0.5, -0.3, 0, 0.3, 0.5, 0.7, 1],
+                                                size=len(self.bounds)) * self.step_size
+            self.p_controller.send_voltages(candidate)
+            time.sleep(0.2)
+            self.p_data_acquisition.update_data(self.best)
+            candidate_eval = self.p_data_acquisition.qber
+            if candidate_eval < best_eval:
+                best, best_eval = candidate, candidate_eval
+                scores.append(best_eval)
+                print('>%d QBER(%s) = %.5f' % (i, best, best_eval))
+            if best_eval < self.threshold:
+                break
+            diff = candidate_eval - curr_eval
+            t = temp / float(i + 1)
+            metropolis = np.exp(-diff / t)
+            if diff < 0 or np.random.rand() < metropolis:
+                curr, curr_eval = candidate, candidate_eval
+        return [best, best_eval, scores]
 
 
 
 class DQN():
     def __init__(self, conf_dict, acquire_polarization_instance, polarization_controller_instance):
         self.configs = conf_dict
-        self.total_runs = self.configs['optimizer']['dqn']['totoal_runs']
+        self.total_runs = self.configs['optimizer']['dqn']['total_runs']
         self.episode = 0
         self.scores = []
         self.all_actions = self.configs['optimizer']['dqn']['all_actions']
@@ -177,25 +177,25 @@ class DQN():
                            self.epsilon_end, self.fc1_dims, self.fc2_dims, self.mem_size,
                            self.model_file)
 
-        def run(self):
-            self.env.p_data_acquisition.update_data(self.env.p_controller.current_voltages)
-            observation = self.env.p_data_acquisition.qber
-            done = False
-            score = 0
-            while not done:
-                action = self.agent.choose_action(observation)
-                observation_, reward, done= self.env.step(action)
-                score += reward
-                self.agent.remember(observation, action, reward, observation_, int(done))
-                observation = observation_
-                self.agent.learn()
-            self.scores.append(score)
-            self.episode += 1
-            if self.episode % 50 == 0:
-                avg_score = np.mean(scores[max(0, counter-100):(counter+1)])
-                logging.info("Episode: {} Average Scores: {}".format(self.episode, avg_score))
-                self.agent.save_model()
+    def run(self):
+        self.env.p_data_acquisition.update_data(self.env.p_controller.current_voltages)
+        observation = self.env.p_data_acquisition.qber
+        done = False
+        score = 0
+        while not done:
+            action = self.agent.choose_action(observation)
+            observation_, reward, done= self.env.step(action)
+            score += reward
+            self.agent.remember(observation, action, reward, observation_, int(done))
+            observation = observation_
+            self.agent.learn()
+        self.scores.append(score)
+        self.episode += 1
+        if self.episode % 50 == 0:
+            avg_score = np.mean(scores[max(0, self.episode - 100):(self.episode + 1)])
+            logging.info(f"Episode: {self.episode} Average Scores: {avg_score}")
+            self.agent.save_model()
             
-        def load_model(self):
-            self.agent.load_model()
+    def load_model(self):
+        self.agent.load_model()
     

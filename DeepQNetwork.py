@@ -161,12 +161,12 @@ class Agent(object):
                            self.epsilon_min else self.epsilon_min
     def save_model(self):
         self.q_eval.save(self.model_file)
-        logger.debug("Model has been saved successfully in file: {}".format(self.model_file))
+        logger.debug(f"Model has been saved successfully in file: {self.model_file}")
 
     def load_model(self):
         try:
             self.q_eval = load_model(self.model_file)
-            logger.info("Model has been loaded successfully from file: {}".format(self.model_file))
+            logger.info(f"Model has been loaded successfully from file: {self.model_file}")
         except:
             logger.critical("Can not load Model! try again or start a new learning journey")
-            exit()
+            raise RuntimeError("Load model failed. Try again or Start without loading!")

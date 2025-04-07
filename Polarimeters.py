@@ -1,3 +1,4 @@
+import time
 import pyvisa
 import serial
 import logging
@@ -37,9 +38,9 @@ class Thorlabs(object):
         power = data[12]*1e3
         psi = data[9];
         chi = data[10];
-        self.s1 = np.cos(2*Psi)*np.cos(2*Chi)
-        self.s2 = np.sin(2*Psi)*np.cos(2*Chi)
-        self.s3 = np.sin(2*Chi)
+        self.s1 = np.cos(2*psi)*np.cos(2*chi)
+        self.s2 = np.sin(2*psi)*np.cos(2*chi)
+        self.s3 = np.sin(2*chi)
         self.unix_time = time.time()
         self.qber = (1 + self.s1)/2
         logger.info("Current QBER: {}".fromat(self.qber))

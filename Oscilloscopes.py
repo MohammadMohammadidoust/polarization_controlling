@@ -106,7 +106,7 @@ class OWON:
             self.sample_rate = samplePts / self.time_base
         else:
             self.sample_rate =  maxRate
-        logger.info("OWON current sample rate: {}".format(self.sample_rate))
+        logger.info(f"OWON current sample rate: {self.sample_rate}")
         return self.sample_rate
     
     def update_device_parameters(self,channel= 1):
@@ -139,7 +139,7 @@ class OWON:
         _len = len(self.data_dict[1])
         if _len == 0:
             logger.critical("OWON captured nothing!!!")
-            exit()
+            raise RuntimeError("OWON couldn't has captured any data")
         all_equal = all(len(self.data_dict[key]) == _len for key in self.data_dict)
         if not all_equal:
             logger.critical("Inconsistent channel data during capture!!")
@@ -185,7 +185,7 @@ class OWON:
         except TypeError:
             logger.critical("Can not extract period indices!!!")
             self.visualise(wave_form, test_form= True)
-            exit()
+            raise RuntimeError("Period incices can not be extracted from the waveform")
         
     def clean_wave_form_data(self, initial_index, final_index):
         logger.debug("Start cleaning waveform")
@@ -202,7 +202,7 @@ class OWON:
         zero_buffer = 0.001
         if np.average(cleaned_wave_form[mid_point-5:mid_point + 5]) > zero_buffer:
             type_one_wave = True
-        logger.info("Type one Wave? {}".format(str(type_one_wave)))
+        logger.info(f"Type one Wave? {type_one_wave}")
         return type_one_wave
 
     def qber_calculator(self):
@@ -230,7 +230,7 @@ class OWON:
         self.hv_qber = V / (H + V)
         self.pm_qber = MINUS / (PLUS + MINUS)
         self.qber = (1 / np.sqrt(2)) * np.sqrt(self.hv_qber**2 + self.pm_qber**2)
-        logger.debug("Current QBER is: {}".format(self.qber))
+        logger.debug(f"Current QBER is: {self.qber}")
 
     def get_data(self):
         logger.debug("Start acquiring data")
@@ -313,7 +313,7 @@ class RIGOL:
             counter += 1
             time.sleep(0.01)
         logger.critical("Something went wrong due to check trigger conditions")
-        exit()
+        raise RuntimeError("Something went wrong due to check trigger conditions")
 
     def capture(self, attempt= 0, max_attempts= 5):
         self.scaled_data = {}
@@ -356,7 +356,7 @@ class RIGOL:
             else:
                 print("Can not capture data!")
                 logger.critical("Maximum capture attempts reached. Exiting capture.")
-                exit()
+                raise RuntimeError("Maximum capture attempts reached. Exiting capture.")
         self.send(self.configs['scope']['rigol']['commands']['start_running'])          
 
     def visualise(self, data):
@@ -398,7 +398,7 @@ class RIGOL:
             logger.error(e)
             self.visualise(self.smoothed_data)
             logger.critical("can not extract period indices!")
-            exit()
+            raise RuntimeError("Period incices can not be extracted from the waveform")
 
     def clean_wave_form_data(self, initial_index, final_index):
         self.cleaned_data = {}
@@ -451,7 +451,7 @@ class RIGOL:
         if self.pm_qber >1 or self.pm_qber <0:
             self.pm_qber = pm_qber_holder
         self.qber = (1 / np.sqrt(2)) * np.sqrt(self.hv_qber**2 + self.pm_qber**2)
-        logger.debug("Current QBER: {}".format(self.qber))
+        logger.debug("Current QBER: {self.qber}")
         
     def get_data(self, source_channel= 1):
         self.capture()
