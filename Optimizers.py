@@ -192,7 +192,10 @@ class DQN():
             self.scores.append(score)
             self.episode += 1
             if self.episode % 50 == 0:
+                avg_score = np.mean(scores[max(0, counter-100):(counter+1)])
+                logging.info("Episode: {} Average Scores: {}".format(self.episode, avg_score))
                 self.agent.save_model()
             
-                
-                
+        def load_model(self):
+            self.agent.load_model()
+    

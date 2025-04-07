@@ -8,6 +8,7 @@ import tensorflow as tf
 import tensorflow.keras as keras
 from tensorflow.keras.optimizers import Adam
 
+logger = logging.getLogger(__name__)
 
 def build_dqn(lr, n_actions, input_dims, fc1_dims, fc2_dims):
     model = Sequential([
@@ -44,8 +45,10 @@ class Environment():
         """
         
         if boundry_condition:
+            logger.debug("Hit the voltage extermom")
             return (-2000, True)                             #reward and done status
         if self.p_data_acquisition.qber < self.terminal_condition:
+            logger.debug("Successfull polarisation restoration")
             return (10.0, True)
         return (-2*(self.p_data_acquisition.qber - self.terminal_condition), False)
 
@@ -158,6 +161,12 @@ class Agent(object):
                            self.epsilon_min else self.epsilon_min
     def save_model(self):
         self.q_eval.save(self.model_file)
+        logger.debug("Model has been saved successfully in file: {}".format(self.model_file))
 
     def load_model(self):
-        self.q_eval = load_model(self.model_file)
+        try:
+            self.q_eval = load_model(self.model_file)
+            logger.info("Model has been loaded successfully from file: {}".format(self.model_file))
+        except:
+            logger.critical("Can not load Model! try again or start a new learning journey")
+            exit()
