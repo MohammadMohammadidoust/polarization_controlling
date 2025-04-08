@@ -19,13 +19,18 @@ class Thorlabs(object):
                           'Unix_time': [], 'Additional_data': []}
         
     def connect(self):
-        rm = pyvisa.ResourceManager()
-        self.device = rm.open_resource(self.resource_address)
-        logger.info("polarimeter connected: {}".format(self.device.query('*IDN?')))
-        self.device.write('{};:{};:{}'.format(self.mode, self.motor_on, self.motor_speed))
-        print("Plarimeter Wavelength(m): {}".format(self.device.query(self.configs['polarimeter']['thorlabs']['queries']['wavelength'])))
-        print("Plarimeter Mode: {}".format(self.device.query(self.configs['polarimeter']['thorlabs']['queries']['mode'])))
-        print("Plarimeter Motor Speed(Hz): {}".format(self.device.query(self.configs['polarimeter']['thorlabs']['queries']['speed'])))
+        try: 
+            rm = pyvisa.ResourceManager()
+            self.device = rm.open_resource(self.resource_address)
+            self.device.write('{};:{};:{}'.format(self.mode, self.motor_on, self.motor_speed))
+            logger.info("polarimeter connected: {}".format(self.device.query('*IDN?')))
+            print("Polarimeter is know connected!")
+            print("Device info: {}".format(self.device.query('*IDN?')))
+        except:
+            logger.critical("ThorLabs connection failed")
+            print("can not connect to ThorLabs Polarimeter!")
+            raise RuntimeError("Failed to connect ThorLabs") 
+
         
     def get_data(self):
         logger.debug("Start getting data from ThorLabs")

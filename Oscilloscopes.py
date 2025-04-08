@@ -44,6 +44,20 @@ class OWON:
         response = self.instrument.query(str(command)).strip()
         return response
 
+    def connect(self):
+        """ the device will be connected automatically as pluged in, 
+        this function is just for checking the connection and there is 
+        no need to call it to connect to the device.
+        """
+        try:
+            print("Oscilloscope is now connected!")
+            self.query('*IDN?')
+        except:
+            logger.critical("OWON connection failed")
+            print("can not connect to OWON Oscilloscope!")
+            raise RuntimeError("Failed to connect OWON") 
+
+
     def auto_set_device(self):
         self.send(self.configs['scope']['owon']['commands']['autoset'])
         logger.debug("start autoset OWON device")
@@ -286,6 +300,19 @@ class RIGOL:
         else:
             response = self.instrument.query(str(command))
         return response
+
+    def connect(self):
+        """ the device will be connected automatically as pluged in, 
+        this function is just for checking the connection and there is 
+        no need to call it to connect to the device.
+        """
+        try:
+            print("Oscilloscope is now connected!")
+            self.query('*IDN?')
+        except:
+            logger.critical("RIGOL connection failed")
+            print("can not connect to RIGOL Oscilloscope!")
+            raise RuntimeError("Failed to connect OWON") 
 
     def auto_set_device(self):
         logger.debug("Start auto setting RIGOL")

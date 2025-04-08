@@ -19,9 +19,12 @@ class OzOptics(object):
         try:
             self.device = serial.Serial(self.port, self.baudrate, timeout= self.timeout)
             logger.info("OzOptics connected successfully!")
+            print("Polarization Controller is now connected!")
+            print(f"device info: OzOptics on port: {self.port} and baudrate: {self.baudrate}")
         except:
             logger.critical("OzOptics connection failed")
-            exit()
+            print("can not connect to OzOptics Polarisation controller!")
+            raise RuntimeError("Failed to connect OzOptics") 
 
     def update_voltages(self, volts: list[int] | np.ndarray) -> None:
         self.current_voltages = volts

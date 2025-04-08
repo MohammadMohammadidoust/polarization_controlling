@@ -1,10 +1,14 @@
 import time
 import json
 from Oscilloscopes import *
-from Polarimeters import Thorlabs
-from PolarizationControllers import OzOptics
+from Polarimeters import *
+from PolarizationControllers import *
 
 CONFIG_FILE = "CONFIG.json"
+
+POLARIZATION_CONTROLLER = "OzOptics"
+OSCILLOSCOPE = "RIGOL"
+POLARIMETER = "ThorLabs"
 
 with open (CONFIG_FILE, 'r') as j_file:
     CONFIGS = json.load(j_file)
