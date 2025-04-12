@@ -1,3 +1,4 @@
+"""
 from scipy.signal import butter, filtfilt
 
 def butter_lowpass(cutoff, fs, order=5):
@@ -51,3 +52,15 @@ smoothed_signal = pywt.waverec(coeffs, wavelet)
 
 
 #############################
+"""
+import logging
+import numpy as np
+import time
+from keras.layers import Dense, Activation
+#from keras.models import Sequential, load_model
+#from keras.optimizers import Adam
+#import tensorflow as tf
+#import tensorflow.keras as keras
+#from tensorflow.keras.optimizers import Adam
+
+2025-04-12 07:42:53.967489: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
