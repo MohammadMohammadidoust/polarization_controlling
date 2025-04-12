@@ -24,8 +24,7 @@ def build_dqn(lr, n_actions, input_dims, fc1_dims, fc2_dims):
 class Environment():
     def __init__(self, actions_space, acquire_polarization_instance,
                  polarization_controller_instance, qber_threshold):
-        self.all_actions= actions_space
-        self.action_indices= list(self.all_actions.keys())
+        self.all_actions = {int(key): value for key, value in actions_space.items()}
         self.p_data_acquisition = acquire_polarization_instance
         self.p_controller = polarization_controller_instance
         #self.current_state= STATE
