@@ -4,7 +4,8 @@ import LoggingConfiguration
 import logging
 from instruments.Oscilloscopes import RIGOL
 from instruments.PolarizationControllers import OzOptics
-from optimizers.Optimizers import DQN
+from optimizers.Optimizers import PSO
+
 CONFIG_FILE = "../CONFIG.json"
 
 with open (CONFIG_FILE, 'r') as j_file:
@@ -16,7 +17,7 @@ logger = logging.getLogger("main")
 
 def scope_configuration(brand= "RIGOL", auto_set= False, source_channel= 1):
     scope = RIGOL(CONFIGS)
-    logger.debug(f"scope with address {scope.resource_address} start configuring")
+    logger.debug("scope with address {} start configuring".format(scope.resource_address))
     print("Scope Address: ", scope.resource_address)
     if auto_set:
         scope.auto_set_device()
@@ -36,7 +37,7 @@ def p_controller_configuration(brand= "OzOptics"):
 
 controller = p_controller_configuration()
 acquirer = scope_configuration()
-optimizer = DQN(CONFIGS, acquirer, controller)
+optimizer = PSO(CONFIGS, acquirer, controller)
 
 acquirer.capture()
 acquirer.visualise(acquirer.scaled_data)
@@ -77,6 +78,6 @@ while True:
         counter += 1
         if counter % 10 == 0:
             #acquirer.visualise(acquirer.cleaned_data)
-            acquirer.extract_results("dqn_first.csv")
+            acquirer.extract_results("first_test.csv")
     except KeyboardInterrupt:
         logger.info("the programme has been finished")
