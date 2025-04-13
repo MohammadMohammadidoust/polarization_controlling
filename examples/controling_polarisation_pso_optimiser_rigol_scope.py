@@ -76,7 +76,7 @@ while True:
             optimizer.run()
         time.sleep(0.2)
         counter += 1
-        if counter % 10 == 0:
+        if counter % 100 == 0:
             #acquirer.visualise(acquirer.cleaned_data)
             acquirer.extract_results("first_test.csv")
     except KeyboardInterrupt:
