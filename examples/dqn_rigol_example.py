@@ -2,11 +2,10 @@ import time
 import json
 import LoggingConfiguration
 import logging
-from Oscilloscopes import RIGOL
-from PolarizationControllers import OzOptics
-from Optimizers import DQN
-
-CONFIG_FILE = "CONFIG.json"
+from instruments.Oscilloscopes import RIGOL
+from instruments.PolarizationControllers import OzOptics
+from optimizers.Optimizers import DQN
+CONFIG_FILE = "../CONFIG.json"
 
 with open (CONFIG_FILE, 'r') as j_file:
     CONFIGS = json.load(j_file)
