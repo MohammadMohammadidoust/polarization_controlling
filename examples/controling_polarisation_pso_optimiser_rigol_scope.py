@@ -62,7 +62,7 @@ counter = 0
 logger.info("start running main programme")
 while True:
     try:
-        acquirer.get_data(source_channel= 1)
+        acquirer.update_data(additional_data= [None, None, None, None], source_channel= 1)
         #print("live pm_qber: ",acquirer.pm_qber)
         #print("live hv_qber: ",acquirer.hv_qber)
         #if acquirer.qber < 0.1:
