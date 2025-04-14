@@ -414,3 +414,142 @@
 2025-04-13 14:45:27,663 [INFO] main: the programme has been finished
 2025-04-13 14:46:29,258 [INFO] instruments.PolarizationControllers: OzOptics connected successfully!
 2025-04-13 14:46:36,286 [INFO] main: start running main programme
+2025-04-14 10:16:02,907 [INFO] instruments.PolarizationControllers: OzOptics connected successfully!
+2025-04-14 10:16:09,469 [INFO] main: start running main programme
+2025-04-14 10:16:09,842 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 10:16:40,018 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 3 with total time: 30.18s
+2025-04-14 10:23:54,209 [ERROR] instruments.Oscilloscopes: Something went wrong due to capturing data!
+2025-04-14 10:23:54,209 [WARNING] instruments.Oscilloscopes: Retrying capture (attempt 1 of 5)...
+2025-04-14 10:32:06,407 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 10:32:16,632 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 1 with total time: 10.23s
+2025-04-14 10:32:17,217 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 10:32:30,398 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 1 with total time: 13.18s
+2025-04-14 10:32:31,528 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 10:32:39,243 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 0 with total time: 7.71s
+2025-04-14 10:33:45,963 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 10:34:05,447 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 2 with total time: 19.48s
+2025-04-14 10:34:06,014 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 10:37:21,027 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 10:37:41,229 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 2 with total time: 20.20s
+2025-04-14 10:38:29,351 [ERROR] instruments.Oscilloscopes: Something went wrong due to capturing data!
+2025-04-14 10:38:29,352 [WARNING] instruments.Oscilloscopes: Retrying capture (attempt 1 of 5)...
+2025-04-14 10:40:08,514 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 10:40:46,181 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 4 with total time: 37.67s
+2025-04-14 10:42:54,747 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 10:43:01,646 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 0 with total time: 6.90s
+2025-04-14 10:45:07,425 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 10:45:08,592 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 0 with total time: 1.17s
+2025-04-14 10:45:14,010 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 10:46:56,193 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 13 with total time: 102.18s
+2025-04-14 10:46:56,780 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 10:47:51,528 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 7 with total time: 54.75s
+2025-04-14 10:50:04,550 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 10:50:37,919 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 4 with total time: 33.37s
+2025-04-14 10:50:38,505 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 10:50:40,084 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 0 with total time: 1.58s
+2025-04-14 10:55:27,730 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 10:56:03,762 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 4 with total time: 36.03s
+2025-04-14 10:56:04,343 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 10:56:36,982 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 4 with total time: 32.64s
+2025-04-14 10:59:57,142 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:01:45,664 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 14 with total time: 108.52s
+2025-04-14 11:01:46,242 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:01:47,797 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 0 with total time: 1.55s
+2025-04-14 11:02:08,714 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:02:12,592 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 0 with total time: 3.88s
+2025-04-14 11:02:13,169 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:03:03,931 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 6 with total time: 50.76s
+2025-04-14 11:03:04,511 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:04:33,260 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 11 with total time: 88.75s
+2025-04-14 11:04:33,843 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:04:51,670 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 2 with total time: 17.83s
+2025-04-14 11:04:52,247 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:05:09,270 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 2 with total time: 17.02s
+2025-04-14 11:05:09,849 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:05:51,029 [ERROR] instruments.Oscilloscopes: Something went wrong due to capturing data!
+2025-04-14 11:05:51,029 [WARNING] instruments.Oscilloscopes: Retrying capture (attempt 1 of 5)...
+2025-04-14 11:06:12,806 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 8 with total time: 62.96s
+2025-04-14 11:08:02,400 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:08:26,757 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 3 with total time: 24.36s
+2025-04-14 11:12:36,665 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:13:27,506 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 6 with total time: 50.84s
+2025-04-14 11:20:50,997 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:20:57,946 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 0 with total time: 6.95s
+2025-04-14 11:20:58,526 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:23:24,576 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:23:59,105 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 4 with total time: 34.53s
+2025-04-14 11:24:51,322 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:24:54,817 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 0 with total time: 3.49s
+2025-04-14 11:25:54,202 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:26:51,269 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 7 with total time: 57.07s
+2025-04-14 11:27:43,120 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:28:16,849 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 4 with total time: 33.73s
+2025-04-14 11:28:44,731 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:29:00,470 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 2 with total time: 15.74s
+2025-04-14 11:32:16,569 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:32:54,122 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 4 with total time: 37.55s
+2025-04-14 11:32:55,251 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:32:57,598 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 0 with total time: 2.35s
+2025-04-14 11:36:07,928 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:36:12,497 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 0 with total time: 4.57s
+2025-04-14 11:36:35,090 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:39:01,157 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:40:08,097 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 8 with total time: 66.94s
+2025-04-14 11:42:58,707 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:43:00,992 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 0 with total time: 2.28s
+2025-04-14 11:43:01,573 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:43:21,738 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 2 with total time: 20.17s
+2025-04-14 11:45:59,768 [ERROR] instruments.Oscilloscopes: Something went wrong due to capturing data!
+2025-04-14 11:45:59,769 [WARNING] instruments.Oscilloscopes: Retrying capture (attempt 1 of 5)...
+2025-04-14 11:51:14,426 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:51:30,253 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 2 with total time: 15.83s
+2025-04-14 11:58:52,813 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 11:59:58,304 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 8 with total time: 65.49s
+2025-04-14 11:59:58,885 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 12:00:13,794 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 1 with total time: 14.91s
+2025-04-14 12:00:14,372 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 12:00:56,747 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 5 with total time: 42.37s
+2025-04-14 12:00:57,331 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 12:03:23,862 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 12:04:24,392 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 7 with total time: 60.53s
+2025-04-14 12:04:24,973 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 12:05:09,279 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 5 with total time: 44.31s
+2025-04-14 12:30:28,135 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 12:31:37,372 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 9 with total time: 69.24s
+2025-04-14 12:34:34,295 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 12:36:15,503 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 13 with total time: 101.21s
+2025-04-14 12:36:16,082 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 12:36:28,566 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 1 with total time: 12.48s
+2025-04-14 12:53:22,562 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 12:53:31,679 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 1 with total time: 9.12s
+2025-04-14 12:53:32,267 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 12:54:15,677 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 5 with total time: 43.41s
+2025-04-14 12:56:34,062 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 12:56:54,117 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 2 with total time: 20.05s
+2025-04-14 13:00:49,537 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 13:01:07,368 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 2 with total time: 17.83s
+2025-04-14 13:01:08,227 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 13:01:11,266 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 0 with total time: 3.04s
+2025-04-14 13:09:45,072 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 13:10:24,519 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 5 with total time: 39.45s
+2025-04-14 13:12:16,026 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 13:12:34,259 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 2 with total time: 18.23s
+2025-04-14 13:12:34,837 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 13:15:01,490 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 13:16:39,574 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 12 with total time: 98.08s
+2025-04-14 13:16:40,158 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 13:17:35,981 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 7 with total time: 55.82s
+2025-04-14 13:21:28,049 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 13:21:30,744 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 0 with total time: 2.70s
+2025-04-14 13:23:39,629 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 13:26:06,152 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 13:26:21,892 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 2 with total time: 15.74s
+2025-04-14 13:28:28,319 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 13:28:50,781 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 2 with total time: 22.46s
+2025-04-14 13:31:07,086 [INFO] optimizers.Optimizers: Start running PSO optimiser
+2025-04-14 13:32:25,965 [INFO] optimizers.Optimizers: Optimization finished at                     iteration 10 with total time: 78.88s
+2025-04-14 13:32:31,139 [ERROR] instruments.Oscilloscopes: Something went wrong due to capturing data!
+2025-04-14 13:32:31,139 [WARNING] instruments.Oscilloscopes: Retrying capture (attempt 1 of 5)...
+2025-04-14 13:32:48,518 [INFO] main: the programme has been finished
+2025-04-14 13:32:48,599 [ERROR] instruments.Oscilloscopes: Something went wrong due to capturing data!
+2025-04-14 13:32:48,599 [WARNING] instruments.Oscilloscopes: Retrying capture (attempt 1 of 5)...
