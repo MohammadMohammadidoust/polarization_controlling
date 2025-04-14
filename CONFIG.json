@@ -167,6 +167,7 @@
 	    "n_iterations": 1000,
 	    "step_size": 100,
 	    "temp": 10,
+	    "initial_threshold": 0.25,
 	    "low": -5000,
 	    "high": 5001
 	},

@@ -93,15 +93,16 @@ class PSO(object):
             self.velocity[iteration + 1] = new_velocity
             self.position_x[iteration + 1] = new_position
             logger.debug(f"Current QBER in iteration {iteration}: {self.p_data_acquisition.qber}")        
-        logger.debug("Optimization finished without reaching the threshold.")
         total_time = time.perf_counter() - begin_time
-        logger.debug(f"Total time: {total_time:.2f}s")
+        logger.info(f"Optimization finished without reaching the threshold. \
+        Total time: {total_time:.2f}s")
 
 
 class SimulatedAnnealing():
     def __init__(self, conf_dict, acquire_polarization_instance, polarization_controller_instance):
         self.configs = conf_dict
         self.threshold = self.configs['optimizer']['qber_threshold']
+        self.initial_threshold = self.configs['optimizer']['sa']['initial_threshold']
         self.dimensions = self.configs['optimizer']['sa']['dimensions']
         self.bounds = self.configs['optimizer']['sa']['bounds']
         self.n_iterations = self.configs['optimizer']['sa']['n_iterations']
@@ -115,37 +116,41 @@ class SimulatedAnnealing():
 
     def run(self):
         logger.info("Start running SA optimiser")
+        begin_time = time.perf_counter()
         self.p_controller.send_voltages(self.best)
         self.p_data_acquisition.update_data(self.best)
-        best_eval = self.p_data_acquisition.qber
-        while best_eval > self.threshold:
+        while self.p_data_acquisition.qber > self.initial_threshold:
             for dimension in range(self.dimensions):
-                best[dimension] = np.random.randint(low= self.low, high= self.high)
+                self.best[dimension] = np.random.randint(low= self.low, high= self.high)
             self.p_controller.send_voltages(self.best)
-            time.sleep(0.2)
+            time.sleep(0.3)
             self.p_data_acquisition.update_data(self.best)
             best_eval = self.p_data_acquisition.qber
-        curr, curr_eval = best, best_eval
-        scores = []
+        curr, curr_eval = self.best, best_eval
         for i in range(self.n_iterations):
             candidate = curr + np.random.choice([-1, -0.7, -0.5, -0.3, 0, 0.3, 0.5, 0.7, 1],
                                                 size=len(self.bounds)) * self.step_size
             self.p_controller.send_voltages(candidate)
-            time.sleep(0.2)
-            self.p_data_acquisition.update_data(self.best)
+            time.sleep(0.3)
+            self.p_data_acquisition.update_data(candidate)
             candidate_eval = self.p_data_acquisition.qber
             if candidate_eval < best_eval:
-                best, best_eval = candidate, candidate_eval
-                scores.append(best_eval)
-                print('>%d QBER(%s) = %.5f' % (i, best, best_eval))
+                self.best, best_eval = candidate, candidate_eval
             if best_eval < self.threshold:
+                self.p_controller.send_voltages(self.best)
+                total_time = time.perfcounter() - begin_time
+                logger.info(f"Optimization finished at \
+                iteration {i} with total time: {total_time:.2f}s")
                 break
             diff = candidate_eval - curr_eval
             t = temp / float(i + 1)
             metropolis = np.exp(-diff / t)
             if diff < 0 or np.random.rand() < metropolis:
                 curr, curr_eval = candidate, candidate_eval
-        return [best, best_eval, scores]
+        total_time = time.perf_counter() - begin_time
+        logger.info(f"Optimization finished without reaching the threshold. \ 
+        Total time: {total_time:.2f}s")
+
 
 
 
