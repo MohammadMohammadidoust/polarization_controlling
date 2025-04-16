@@ -158,6 +158,7 @@ class SimulatedAnnealing():
 class DQN():
     def __init__(self, conf_dict, acquire_polarization_instance, polarization_controller_instance):
         self.configs = conf_dict
+        self.model_type = self.configs['optimizer']['dqn']['model_type']
         self.total_runs = self.configs['optimizer']['dqn']['total_runs']
         self.episode = 0
         self.scores = []
@@ -170,18 +171,23 @@ class DQN():
         self.learning_rate = self.configs['optimizer']['dqn']['learning_rate']
         self.fc1_dims = self.configs['optimizer']['dqn']['fc1_dims']
         self.fc2_dims = self.configs['optimizer']['dqn']['fc2_dims']
+        self.fc3_dims = self.configs['optimizer']['dqn']['fcvalue_dims']
+        self.fc4_dims = self.configs['optimizer']['dqn']['fcadvantage_dims']
         self.gamma = self.configs['optimizer']['dqn']['gamma']
         self.epsilon = self.configs['optimizer']['dqn']['epsilon']
         self.epsilon_dec = self.configs['optimizer']['dqn']['epsilon_dec']
         self.epsilon_end = self.configs['optimizer']['dqn']['epsilon_end']
         self.batch_size = self.configs['optimizer']['dqn']['batch_size']
         self.model_file = self.configs['optimizer']['dqn']['fname']
+        self.model_file2 = self.configs['optimizer']['dqn']['fname2']
+        self.replace_target = self.configs['optimizer']['dqn']['replace_target']
         self.env = Environment(self.all_actions, acquire_polarization_instance,
                                polarization_controller_instance, self.qber_threshold)
         self.agent = Agent(self.learning_rate, self.gamma, self.n_actions, self.discrete,
                            self.epsilon, self.batch_size, self.input_dims, self.epsilon_dec,
-                           self.epsilon_end, self.fc1_dims, self.fc2_dims, self.mem_size,
-                           self.model_file)
+                           self.epsilon_end, self.fc1_dims, self.fc2_dims, self.fc3_dims,
+                           self.fc4_dims, self.mem_size, self.model_file, self.model_file2,
+                           self.model_type, self.replace_target)
 
     def run(self):
         self.env.p_data_acquisition.update_data(self.env.p_controller.current_voltages)

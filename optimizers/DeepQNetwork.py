@@ -25,6 +25,26 @@ def build_dqn(lr, n_actions, input_dims, fc1_dims, fc2_dims):
     return model
 
 
+def build_dueling_dqn(lr, n_actions, input_dims, fc1_dims, fc2_dims, fcvalue_dims,
+                      fcadvantage_dims):
+    input_layer = keras.layers.Input(shape=(input_dims,))
+    dense1 = Dense(fc1_dims, activation='relu')(input_layer)
+    dense2 = Dense(fc2_dims, activation='relu')(dense1)
+    value_fc = Dense(fcvalue_dims, activation='relu')(dense2)
+    value = Dense(1, activation=None)(value_fc)
+    advantage_fc = Dense(fcadvantage_dims, activation='relu')(dense2)
+    advantage = Dense(n_actions, activation=None)(advantage_fc)
+
+    def combine_streams(inputs):
+        v, a = inputs
+        return v + (a - tf.reduce_mean(a, axis=1, keepdims=True))
+
+    q_values = keras.layers.Lambda(combine_streams)([value, advantage])
+    
+    model = keras.Model(inputs=input_layer, outputs=q_values)
+    model.compile(optimizer=Adam(learning_rate=lr), loss='mse')
+    return model
+
 class Environment():
     def __init__(self, actions_space, acquire_polarization_instance,
                  polarization_controller_instance, qber_threshold):
@@ -118,18 +138,40 @@ class ReplayBuffer(object):
         return states, actions, rewards, states_, terminal
 
 class Agent(object):
-    def __init__(self, alpha, gamma, n_actions, discrete, epsilon, batch_size,
-                 input_dims, epsilon_dec=0.996,  epsilon_end=0.01,
-                 fc1_dims= 256, fc2_dims= 256, mem_size=1000000, fname='dqn_model.h5'):
+    def __init__(self, alpha, gamma, n_actions, discrete, epsilon,
+                 batch_size, input_dims, epsilon_dec=0.996,
+                 epsilon_end=0.01, fc1_dims= 256, fc2_dims= 256,
+                 fcvalue_dims= 128, fcadvantage_dims= 128,
+                 mem_size=1000000, fname='vanilla_dqn_model.h5',
+                 fname2= 'double_dqn_target_model.h5',
+                 model_type= "VanillaDQN", replace_target= 100):
+        self.model_type = model_type
         self.action_space = [i for i in range(n_actions)]
         self.gamma = gamma
         self.epsilon = epsilon
         self.epsilon_dec = epsilon_dec
         self.epsilon_min = epsilon_end
         self.batch_size = batch_size
+        self.replace_target_cnt = replace_target
+        self.learn_step_counter = 0
         self.model_file = fname
+        self.target_model_file = fname2
         self.memory = ReplayBuffer(mem_size, input_dims, n_actions, discrete)
-        self.q_eval = build_dqn(alpha, n_actions, input_dims, fc1_dims, fc2_dims)
+        if model_type in ["VanillaDQN", "DoubleDQN"]:
+            self.q_eval = build_dqn(alpha, n_actions, input_dims, fc1_dims, fc2_dims)
+            self.q_target = build_dqn(alpha, n_actions, input_dims, fc1_dims, fc2_dims)
+        elif model_type in ["DuelingDQN", "DoubleDuelingDQN"]:
+            self.q_eval = build_dueling_dqn(alpha, n_actions, input_dims, fc1_dims, fc2_dims,
+                                            fcvalue_dims, fcadvantage_dims)
+            self.q_target = build_dueling_dqn(alpha, n_actions, input_dims, fc1_dims, fc2_dims,
+                                              fcvalue_dims, fcadvantage_dims)
+        else:
+            logger.error("Model is Not Valid! check the model name again!")
+            raise ValueError("Invalid model type selected.")
+        self.update_target_network()
+
+    def update_target_network(self):
+        self.q_target.set_weights(self.q_eval.get_weights())    
 
     def remember(self, state, action, reward, new_state, done):
         self.memory.store_transition(state, action, reward, new_state, done)
@@ -145,29 +187,53 @@ class Agent(object):
         return action
 
     def learn(self):
-        if self.memory.mem_cntr > self.batch_size:
-            state, action, reward, new_state, done = \
-                                          self.memory.sample_buffer(self.batch_size)
-
-            action_values = np.array(self.action_space, dtype=np.int8)
-            action_indices = np.dot(action, action_values)
-            q_eval = self.q_eval.predict(state)
-            q_next = self.q_eval.predict(new_state)
+        if self.memory.mem_cntr < self.batch_size:
+            return
+        state, action, reward, new_state, done = \
+            self.memory.sample_buffer(self.batch_size)
+        action_values = np.array(self.action_space, dtype=np.int8)
+        action_indices = np.dot(action, action_values)
+        q_eval = self.q_eval.predict(state)
+        q_next = self.q_target.predict(new_state)
+        if self.model_type in ["DoubleDQN", "DoubleDuelingDQN"]:
+            q_eval_next = self.q_eval.predict(new_state)
+            next_actions = np.argmax(q_eval_next, axis= 1)
+            q_target_next = self.q_target.predict(new_state)
             q_target = q_eval.copy()
-            batch_index = np.arange(self.batch_size, dtype=np.int32)
+            batch_index = np.arange(self.batch_size, dtype= np.int32)
             q_target[batch_index, action_indices] = reward + \
-                                  self.gamma*np.max(q_next, axis=1)*done
-            _ = self.q_eval.fit(state, q_target, verbose=0)
-            self.epsilon = self.epsilon*self.epsilon_dec if self.epsilon > \
-                           self.epsilon_min else self.epsilon_min
+                self.gamma * q_target_next[batch_index, next_actions] * done
+        else:
+            q_target = q_eval.copy()
+            batch_index = np.arange(self.batch_size, dtype= np.int32)
+            q_target[batch_index, action_indices] = reward + \
+                self.gamma * np.max(q_next, axis= 1) * done
+            
+        _ = self.q_eval.fit(state, q_target, verbose=0)
+        self.learn_step_counter += 1
+        self.epsilon = self.epsilon*self.epsilon_dec if self.epsilon > \
+            self.epsilon_min else self.epsilon_min
+        if self.learn_step_counter% self.replace_target_cnt == 0:
+            self.update_target_network()
+        
     def save_model(self):
         self.q_eval.save(self.model_file)
-        logger.debug(f"Model has been saved successfully in file: {self.model_file}")
+        logger.info(f"Evaluation Model has been saved successfully in file: {self.model_file}")
+        if self.model_type in ["DoubleDQN", "DoubleDuelingDQN"]:
+            self.q_target.save(self.target_model_file)
+            logger.info(f"Target Model has been saved successfully in file: {self.target_model_file}")
 
     def load_model(self):
         try:
             self.q_eval = load_model(self.model_file)
-            logger.info(f"Model has been loaded successfully from file: {self.model_file}")
+            logger.info(f"Evaluation Model has been loaded successfully from file: {self.model_file}")
+            if self.model_type in ["DoubleDQN", "DoubleDuelingDQN"]:
+                try:
+                    self.q_target = load_model(self.target_model_file)
+                    logger.info(f"Target Model has been loaded successfully from file: {self.target_model_file}")
+                except:
+                    logger.critical("Can not load Target Model! try again or start a new learning journey")
+                    raise RuntimeError("Load model failed. Try again or Start without loading!")
         except:
-            logger.critical("Can not load Model! try again or start a new learning journey")
+            logger.critical("Can not load Evaluation Model! try again or start a new learning journey")
             raise RuntimeError("Load model failed. Try again or Start without loading!")
