@@ -119,6 +119,7 @@ class SimulatedAnnealing():
         begin_time = time.perf_counter()
         self.p_controller.send_voltages(self.best)
         self.p_data_acquisition.update_data(self.best)
+        best_eval = self.p_data_acquisition.qber
         while self.p_data_acquisition.qber > self.initial_threshold:
             for dimension in range(self.dimensions):
                 self.best[dimension] = np.random.randint(low= self.low, high= self.high)
@@ -138,18 +139,18 @@ class SimulatedAnnealing():
                 self.best, best_eval = candidate, candidate_eval
             if best_eval < self.threshold:
                 self.p_controller.send_voltages(self.best)
-                total_time = time.perfcounter() - begin_time
+                total_time = time.perf_counter() - begin_time
                 logger.info(f"Optimization finished at \
                 iteration {i} with total time: {total_time:.2f}s")
                 break
             diff = candidate_eval - curr_eval
-            t = temp / float(i + 1)
+            t = self.temp / float(i + 1)
             metropolis = np.exp(-diff / t)
             if diff < 0 or np.random.rand() < metropolis:
                 curr, curr_eval = candidate, candidate_eval
         total_time = time.perf_counter() - begin_time
-        logger.info(f"Optimization finished without reaching the threshold. \ 
-        Total time: {total_time:.2f}s")
+        logger.info(f"Optimization finished without reaching the threshold. \
+                    Total time: {total_time:.2f}s")
 
 
 
@@ -189,15 +190,17 @@ class DQN():
         score = 0
         while not done:
             action = self.agent.choose_action(observation)
+            print("action: ", action)
             observation_, reward, done= self.env.step(action)
             score += reward
+            print("score: ", score)
             self.agent.remember(observation, action, reward, observation_, int(done))
             observation = observation_
             self.agent.learn()
         self.scores.append(score)
         self.episode += 1
         if self.episode % 50 == 0:
-            avg_score = np.mean(scores[max(0, self.episode - 100):(self.episode + 1)])
+            avg_score = np.mean(self.scores[max(0, self.episode - 100):(self.episode + 1)])
             logging.info(f"Episode: {self.episode} Average Scores: {avg_score}")
             self.agent.save_model()
             

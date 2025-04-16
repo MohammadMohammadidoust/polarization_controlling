@@ -553,3 +553,121 @@
 2025-04-14 13:32:48,518 [INFO] main: the programme has been finished
 2025-04-14 13:32:48,599 [ERROR] instruments.Oscilloscopes: Something went wrong due to capturing data!
 2025-04-14 13:32:48,599 [WARNING] instruments.Oscilloscopes: Retrying capture (attempt 1 of 5)...
+2025-04-14 15:57:12,974 [INFO] instruments.PolarizationControllers: OzOptics connected successfully!
+2025-04-14 15:57:19,656 [INFO] main: start running main programme
+2025-04-14 15:57:44,384 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 15:57:46,997 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 2.61s
+2025-04-14 15:57:46,997 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 2.61s
+2025-04-14 15:57:47,569 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 15:57:51,830 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 3 with total time: 4.26s
+2025-04-14 15:57:51,830 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 4.26s
+2025-04-14 15:58:03,028 [INFO] main: the programme has been finished
+2025-04-14 15:59:20,774 [INFO] instruments.PolarizationControllers: OzOptics connected successfully!
+2025-04-14 15:59:27,390 [INFO] main: start running main programme
+2025-04-14 16:00:15,865 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:02:22,860 [INFO] main: the programme has been finished
+2025-04-14 16:02:23,219 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:02:51,421 [INFO] instruments.PolarizationControllers: OzOptics connected successfully!
+2025-04-14 16:02:57,921 [INFO] main: start running main programme
+2025-04-14 16:02:58,314 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:09:20,627 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 382.31s
+2025-04-14 16:09:21,222 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:09:46,280 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 51 with total time: 25.06s
+2025-04-14 16:09:46,281 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 25.06s
+2025-04-14 16:11:09,745 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:11:10,180 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.43s
+2025-04-14 16:11:10,180 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.43s
+2025-04-14 16:19:28,006 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:19:28,455 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.45s
+2025-04-14 16:19:28,456 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.45s
+2025-04-14 16:23:36,007 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:23:36,472 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.46s
+2025-04-14 16:23:36,472 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.46s
+2025-04-14 16:24:33,780 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:24:34,258 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.48s
+2025-04-14 16:24:34,258 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.48s
+2025-04-14 16:24:35,139 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:24:35,613 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.47s
+2025-04-14 16:24:35,613 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.47s
+2025-04-14 16:24:41,704 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:24:42,142 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.44s
+2025-04-14 16:24:42,142 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.44s
+2025-04-14 16:25:21,375 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:26:44,075 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 208 with total time: 82.70s
+2025-04-14 16:26:44,076 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 82.70s
+2025-04-14 16:26:44,946 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:26:45,424 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.48s
+2025-04-14 16:26:45,424 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.48s
+2025-04-14 16:26:55,138 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:26:55,572 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.43s
+2025-04-14 16:26:55,572 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.43s
+2025-04-14 16:29:39,752 [ERROR] instruments.Oscilloscopes: Something went wrong due to capturing data!
+2025-04-14 16:29:39,752 [WARNING] instruments.Oscilloscopes: Retrying capture (attempt 1 of 5)...
+2025-04-14 16:33:27,060 [ERROR] instruments.Oscilloscopes: Something went wrong due to capturing data!
+2025-04-14 16:33:27,061 [WARNING] instruments.Oscilloscopes: Retrying capture (attempt 1 of 5)...
+2025-04-14 16:33:28,458 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:35:33,343 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 324 with total time: 124.89s
+2025-04-14 16:35:33,343 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 124.89s
+2025-04-14 16:38:41,872 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:38:42,318 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.45s
+2025-04-14 16:38:42,318 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.45s
+2025-04-14 16:41:57,709 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:41:58,158 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.45s
+2025-04-14 16:41:58,158 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.45s
+2025-04-14 16:42:47,169 [ERROR] instruments.Oscilloscopes: Something went wrong due to capturing data!
+2025-04-14 16:42:47,169 [WARNING] instruments.Oscilloscopes: Retrying capture (attempt 1 of 5)...
+2025-04-14 16:42:53,668 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:42:54,109 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.44s
+2025-04-14 16:42:54,109 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.44s
+2025-04-14 16:43:21,750 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:43:22,217 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.47s
+2025-04-14 16:43:22,217 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.47s
+2025-04-14 16:44:44,368 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:44:44,815 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.45s
+2025-04-14 16:44:44,816 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.45s
+2025-04-14 16:47:30,789 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:47:31,222 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.43s
+2025-04-14 16:47:31,223 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.43s
+2025-04-14 16:49:24,210 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:49:24,692 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.48s
+2025-04-14 16:49:24,692 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.48s
+2025-04-14 16:51:40,859 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:51:41,339 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.48s
+2025-04-14 16:51:41,340 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.48s
+2025-04-14 16:53:04,437 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:53:04,885 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.45s
+2025-04-14 16:53:04,885 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.45s
+2025-04-14 16:54:56,323 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 16:54:56,787 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.46s
+2025-04-14 16:54:56,787 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.46s
+2025-04-14 16:55:35,036 [ERROR] instruments.Oscilloscopes: Something went wrong due to capturing data!
+2025-04-14 16:55:35,036 [WARNING] instruments.Oscilloscopes: Retrying capture (attempt 1 of 5)...
+2025-04-14 17:10:40,629 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 17:10:41,073 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.44s
+2025-04-14 17:10:41,073 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.44s
+2025-04-14 17:13:24,891 [INFO] optimizers.Optimizers: Start running SA optimiser
+2025-04-14 17:13:25,342 [INFO] optimizers.Optimizers: Optimization finished at                 iteration 0 with total time: 0.45s
+2025-04-14 17:13:25,343 [INFO] optimizers.Optimizers: Optimization finished without reaching the threshold.                     Total time: 0.45s
+2025-04-14 17:13:58,371 [INFO] main: the programme has been finished
+2025-04-14 17:13:58,424 [ERROR] instruments.Oscilloscopes: Something went wrong due to capturing data!
+2025-04-14 17:13:58,424 [WARNING] instruments.Oscilloscopes: Retrying capture (attempt 1 of 5)...
+2025-04-15 15:05:58,174 [INFO] instruments.PolarizationControllers: OzOptics connected successfully!
+2025-04-15 15:06:04,806 [INFO] main: start running main programme
+2025-04-15 15:06:06,519 [ERROR] instruments.Oscilloscopes: index 0 is out of bounds for axis 0 with size 0
+2025-04-15 15:06:06,718 [CRITICAL] instruments.Oscilloscopes: can not extract period indices!
+2025-04-15 15:06:53,597 [INFO] instruments.PolarizationControllers: OzOptics connected successfully!
+2025-04-15 15:07:00,002 [INFO] main: start running main programme
+2025-04-15 15:09:42,991 [INFO] main: the programme has been finished
+2025-04-15 15:14:09,799 [INFO] instruments.PolarizationControllers: OzOptics connected successfully!
+2025-04-15 15:14:16,288 [INFO] main: start running main programme
+2025-04-15 15:47:49,774 [INFO] root: Episode: 50 Average Scores: -1907.0158265946673
+2025-04-15 15:47:49,775 [WARNING] absl: You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
+2025-04-15 16:20:30,544 [INFO] root: Episode: 100 Average Scores: -1423.464740184495
+2025-04-15 16:20:30,544 [WARNING] absl: You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
+2025-04-15 16:47:32,366 [INFO] root: Episode: 150 Average Scores: -1065.907139989169
+2025-04-15 16:47:32,366 [WARNING] absl: You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
+2025-04-15 17:38:59,061 [ERROR] instruments.Oscilloscopes: Something went wrong due to capturing data!
+2025-04-15 17:38:59,062 [WARNING] instruments.Oscilloscopes: Retrying capture (attempt 1 of 5)...
+2025-04-15 17:41:05,080 [INFO] main: the programme has been finished
+2025-04-15 17:41:05,153 [ERROR] instruments.Oscilloscopes: Something went wrong due to capturing data!
+2025-04-15 17:41:05,154 [WARNING] instruments.Oscilloscopes: Retrying capture (attempt 1 of 5)...

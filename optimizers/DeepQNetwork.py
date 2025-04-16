@@ -135,9 +135,7 @@ class Agent(object):
         self.memory.store_transition(state, action, reward, new_state, done)
 
     def choose_action(self, state):
-        if isinstance(state, list):
-            state = np.array(state)
-        state = state[np.newaxis, :]
+        state = np.atleast_2d(state)
         rand = np.random.random()
         if rand < self.epsilon:
             action = np.random.choice(self.action_space)

@@ -61,7 +61,7 @@ counter = 0
 logger.info("start running main programme")
 while True:
     try:
-        acquirer.get_data(source_channel= 1)
+        acquirer.update_data(additional_data= [None, None, None, None], source_channel= 1)
         #print("live pm_qber: ",acquirer.pm_qber)
         #print("live hv_qber: ",acquirer.hv_qber)
         #if acquirer.qber < 0.1:
@@ -75,7 +75,7 @@ while True:
             optimizer.run()
         time.sleep(0.2)
         counter += 1
-        if counter % 10 == 0:
+        if counter % 100 == 0:
             #acquirer.visualise(acquirer.cleaned_data)
             acquirer.extract_results("dqn_first.csv")
     except KeyboardInterrupt:
