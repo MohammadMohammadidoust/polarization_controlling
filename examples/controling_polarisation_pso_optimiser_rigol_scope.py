@@ -1,6 +1,6 @@
 import time
 import json
-import LoggingConfiguration
+from logs import LoggingConfiguration
 import logging
 from instruments.Oscilloscopes import RIGOL
 from instruments.PolarizationControllers import OzOptics
