@@ -1,7 +1,7 @@
 import time
 import json
 import logging
-form logs import LoggingConfiguration
+from logs import LoggingConfiguration
 from instruments.Oscilloscopes import RIGOL
 from instruments.PolarizationControllers import OzOptics
 from optimizers.Optimizers import SimulatedAnnealing
