@@ -435,13 +435,25 @@ class RIGOL:
         self.cleaned_data['time_data'] = np.array(self.cleaned_data['time_data']) - time_shift
 
     def discriminator(self, s_channel):
+        '''
         type_one_wave = False
         mid_point = int(len(self.cleaned_data[s_channel])/2)
         zero_buffer = 0.001
         if np.average(self.cleaned_data[s_channel][mid_point-5:mid_point + 5]) > zero_buffer:
             type_one_wave = True
         return type_one_wave
+        '''
+        type_one_wave = False
+        zero_buffer = 0.001
+        wave_size = len(self.cleaned_data[s_channel])
+        initial_index = int(wave_size * self.pduty1)
+        final_index = int(wave_size * (self.pduty1 + self.nduty1))
+        first_gap = np.average(self.cleaned_data[s_channel][initial_index:final_index])
+        if first_gap > zero_buffer:
+            type_one_wave = True
+        return type_one_wave
 
+        
     def qber_calculator(self, wave_type_one):
         self.unix_time = time.time()
         hv_qber_holder = self.hv_qber

@@ -1,10 +1,10 @@
 import time
 import json
-import LoggingConfiguration
 import logging
+form logs import LoggingConfiguration
 from instruments.Oscilloscopes import RIGOL
 from instruments.PolarizationControllers import OzOptics
-from optimizers.Optimizers import PSO
+from optimizers.Optimizers import SimulatedAnnealing
 
 CONFIG_FILE = "../CONFIG.json"
 
@@ -47,7 +47,7 @@ acquirer.visualise(acquirer.smoothed_data)
 
 i, f = acquirer.extract_period_index_v4(s_channel= 1)
 acquirer.clean_wave_form_data(i, f)
-#acquirer.visualise(acquirer.cleaned_data)
+acquirer.visualise(acquirer.cleaned_data)
 type_one = acquirer.discriminator(s_channel= 1)
 print("type one wave: ", type_one)
 acquirer.qber_calculator(type_one)
@@ -78,6 +78,6 @@ while True:
         counter += 1
         if counter % 100 == 0:
             #acquirer.visualise(acquirer.cleaned_data)
-            acquirer.extract_results("second_test.csv")
+            acquirer.extract_results("pso_first_test.csv")
     except KeyboardInterrupt:
         logger.info("the programme has been finished")
