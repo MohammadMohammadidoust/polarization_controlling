@@ -96,7 +96,7 @@ Please review our CONTRIBUTING.md for detailed contribution guidelines and best 
 ---
 
 ## Publications and citation
-This work has led to this [paper](publications/2024-Active polarization controlling in optical fiber links using optimization algorithms.pdf) and is being used in our current projects. In case of scientific usage, please cite our main article : [Asgari, Hamid & Khodabandeh, Majid & Hajibaba, Soheil & Dadahkhani, Amir & Madani, Seyed. (2024). Active polarization controlling in optical fiber links using optimization algorithms. Indian Journal of Physics. 99. 1-8. 10.1007/s12648-024-03342-w. ](https://www.researchgate.net/publication/382523272_Active_polarization_controlling_in_optical_fiber_links_using_optimization_algorithms)
+This work has led to this ![paper](publications/Active_polarization_controlling.pdf) and is being used in our current projects. In case of scientific usage, please cite our main article : [Asgari, Hamid & Khodabandeh, Majid & Hajibaba, Soheil & Dadahkhani, Amir & Madani, Seyed. (2024). Active polarization controlling in optical fiber links using optimization algorithms. Indian Journal of Physics. 99. 1-8. 10.1007/s12648-024-03342-w. ](https://www.researchgate.net/publication/382523272_Active_polarization_controlling_in_optical_fiber_links_using_optimization_algorithms)
 
 ## References
 
