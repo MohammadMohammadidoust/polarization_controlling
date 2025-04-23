@@ -95,7 +95,11 @@ Please review our CONTRIBUTING.md for detailed contribution guidelines and best 
 
 ---
 
-## References
- - [Optical polarization controllers for endless polarization control](https://opg.optica.org/oe/fulltext.cfm?uri=oe-22-7-8259&id=282433)    
-  - [Electrical polarization control in optical fibres](https://digital-library.theiet.org/doi/abs/10.1049/el.2011.1522)  
+## Publications and citation
+This work has led to this [paper](publications/2024-Active polarization controlling in optical fiber links using optimization algorithms.pdf) and is being used in our current projects. In case of scientific usage, please cite our main article : [Asgari, Hamid & Khodabandeh, Majid & Hajibaba, Soheil & Dadahkhani, Amir & Madani, Seyed. (2024). Active polarization controlling in optical fiber links using optimization algorithms. Indian Journal of Physics. 99. 1-8. 10.1007/s12648-024-03342-w. ](https://www.researchgate.net/publication/382523272_Active_polarization_controlling_in_optical_fiber_links_using_optimization_algorithms)
 
+## References
+
+  - [Optical polarization controllers for endless polarization control](https://opg.optica.org/oe/fulltext.cfm?uri=oe-22-7-8259&id=282433)    
+  - [Electrical polarization control in optical fibres](https://digital-library.theiet.org/doi/abs/10.1049/el.2011.1522)  
+  - [Active polarization controlling in optical fiber links using optimization algorithms](https://www.researchgate.net/publication/382523272_Active_polarization_controlling_in_optical_fiber_links_using_optimization_algorithms)
