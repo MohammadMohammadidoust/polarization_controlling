@@ -66,7 +66,7 @@ class PSO(object):
                 current_position = self.position_x[iteration, particle_no, :]
                 current_voltage = current_position.astype(int).tolist()
                 self.p_controller.send_voltages(current_voltage)
-                time.sleep(0.3)
+                time.sleep(0.4)
                 self.p_data_acquisition.update_data(current_voltage)
                 current_qber = self.p_data_acquisition.qber
                 self.qber_values[iteration, particle_no] = current_qber
@@ -124,7 +124,7 @@ class SimulatedAnnealing():
             for dimension in range(self.dimensions):
                 self.best[dimension] = np.random.randint(low= self.low, high= self.high)
             self.p_controller.send_voltages(self.best)
-            time.sleep(0.3)
+            time.sleep(0.35)
             self.p_data_acquisition.update_data(self.best)
             best_eval = self.p_data_acquisition.qber
         curr, curr_eval = self.best, best_eval
@@ -132,7 +132,7 @@ class SimulatedAnnealing():
             candidate = curr + np.random.choice([-1, -0.7, -0.5, -0.3, 0, 0.3, 0.5, 0.7, 1],
                                                 size=len(self.bounds)) * self.step_size
             self.p_controller.send_voltages(candidate)
-            time.sleep(0.3)
+            time.sleep(0.35)
             self.p_data_acquisition.update_data(candidate)
             candidate_eval = self.p_data_acquisition.qber
             if candidate_eval < best_eval:

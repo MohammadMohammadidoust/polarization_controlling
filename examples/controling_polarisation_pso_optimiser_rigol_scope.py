@@ -4,7 +4,7 @@ import logging
 from logs import LoggingConfiguration
 from instruments.Oscilloscopes import RIGOL
 from instruments.PolarizationControllers import OzOptics
-from optimizers.Optimizers import SimulatedAnnealing
+from optimizers.Optimizers import PSO
 
 CONFIG_FILE = "../CONFIG.json"
 
@@ -70,14 +70,14 @@ while True:
         #    print("type one wave: ", acquirer.discriminator(s_channel= 1))
         #    acquirer.visualise(acquirer.smoothed_data)
         print("Live QBER: ", acquirer.qber)
-        if 0.12 < acquirer.qber:
+        if 0.095 < acquirer.qber:
             print("start running optimiser")
             time.sleep(0.3)
             optimizer.run()
-        time.sleep(0.2)
+        time.sleep(0.4)
         counter += 1
         if counter % 100 == 0:
             #acquirer.visualise(acquirer.cleaned_data)
-            acquirer.extract_results("sa_first_test.csv")
+            acquirer.extract_results("pso_first_test_10km.csv")
     except KeyboardInterrupt:
         logger.info("the programme has been finished")

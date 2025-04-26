@@ -69,7 +69,7 @@ while True:
         #    print("type one wave: ", acquirer.discriminator(s_channel= 1))
         #    acquirer.visualise(acquirer.smoothed_data)
         print("Live QBER: ", acquirer.qber)
-        if 0.12 < acquirer.qber:
+        if 0.075 < acquirer.qber:
             print("start running optimiser")
             time.sleep(0.3)
             optimizer.run()

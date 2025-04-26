@@ -1,12 +1,11 @@
 import pyvisa
 import time
-import json
 import logging
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from pandas.core.array_algos.transforms import shift
 from quantiphy import Quantity
-from scipy.signal import find_peaks
 from scipy.signal import savgol_filter
 
 logger = logging.getLogger(__name__)
@@ -384,7 +383,7 @@ class RIGOL:
                 print("Can not capture data!")
                 logger.critical("Maximum capture attempts reached. Exiting capture.")
                 raise RuntimeError("Maximum capture attempts reached. Exiting capture.")
-        self.send(self.configs['scope']['rigol']['commands']['start_running'])          
+        self.send(self.configs['scope']['rigol']['commands']['start_running'])
 
     def visualise(self, data):
         fig, ax = plt.subplots()
@@ -404,11 +403,15 @@ class RIGOL:
         stop_index = end[0]
         return [start_index, stop_index]
 
-    def smoother(self):
+    def smoother(self, vertical_shift= True):
         self.smoothed_data = {}
         for channel in self.channels:
             self.smoothed_data[channel] = savgol_filter(self.scaled_data[channel].copy(), 15, 1)
         self.smoothed_data['time_data'] = self.scaled_data['time_data'].copy()
+        if vertical_shift:
+            for channel in self.channels:
+                shift_point = np.average(np.sort(self.smoothed_data[channel])[:100])
+                self.smoothed_data[channel] = self.smoothed_data[channel] - shift_point
             
     def extract_period_index_v4(self, s_channel):
         self.smoother()
@@ -429,31 +432,22 @@ class RIGOL:
 
     def clean_wave_form_data(self, initial_index, final_index):
         self.cleaned_data = {}
-        for key in self.scaled_data:
-            self.cleaned_data[key] = self.scaled_data[key][initial_index:final_index]
-        time_shift = self.scaled_data['time_data'][initial_index]
+        for key in self.smoothed_data:
+            self.cleaned_data[key] = self.smoothed_data[key][initial_index:final_index]
+        time_shift = self.smoothed_data['time_data'][initial_index]
         self.cleaned_data['time_data'] = np.array(self.cleaned_data['time_data']) - time_shift
 
     def discriminator(self, s_channel):
-        '''
         type_one_wave = False
-        mid_point = int(len(self.cleaned_data[s_channel])/2)
-        zero_buffer = 0.001
-        if np.average(self.cleaned_data[s_channel][mid_point-5:mid_point + 5]) > zero_buffer:
-            type_one_wave = True
-        return type_one_wave
-        '''
-        type_one_wave = False
-        zero_buffer = 0.001
         wave_size = len(self.cleaned_data[s_channel])
-        initial_index = int(wave_size * self.pduty1)
-        final_index = int(wave_size * (self.pduty1 + self.nduty1))
-        first_gap = np.average(self.cleaned_data[s_channel][initial_index:final_index])
-        if first_gap > zero_buffer:
+        check_point1 = int(wave_size * (self.pduty1 + (self.nduty1 / 2)))
+        check_point2 = int(wave_size * (self.pduty1 + self.nduty1 + self.pduty2 + (self.nduty2 / 2)))
+        first_assumed_gap = np.average(self.cleaned_data[s_channel][check_point1 -5 : check_point1 + 5])
+        second_assumed_gap = np.average(self.cleaned_data[s_channel][check_point2 -5 : check_point2 + 5])
+        # 0.3 is an assumed value that seems to be worked!
+        if (np.abs(first_assumed_gap) / np.abs(second_assumed_gap)) > 0.3:
             type_one_wave = True
         return type_one_wave
-
-        
     def qber_calculator(self, wave_type_one):
         self.unix_time = time.time()
         hv_qber_holder = self.hv_qber

@@ -111,11 +111,11 @@
 	    },
 	    "wave": {
 		"amplitude": 0.05,
-		"frequency": 100,
-		"nduty1": 0.2,
-		"nduty2": 0.4,
-		"pduty1": 0.2,
-		"pduty2": 0.2,
+		"frequency": 25,
+		"nduty1": 0.05,
+		"nduty2": 0.2,
+		"pduty1": 0.375,
+		"pduty2": 0.375,
 		"comment": "I should modify something about duties in rigol class"
 	    },
 	    "commands": {
@@ -126,14 +126,14 @@
 		"initialise": {
 		    "general": [
 			":TRIG:EDGE:SOUR CHAN1",
-			":TRIG:EDGE:LEV 0.004",
+			":TRIG:EDGE:LEV 0.0",
 			":TRIG:EDGE:SLOP POS",
 			"TIMEBASE:HREF:MODE TPOSITION"
 		    ],
 		    "channel": [
 			":CHANNEL{}:DISP ON",
-			":CHANNEL{}:OFFSET 0",
-			":CHANNEL{}:SCALE 0.02",
+			":CHANNEL{}:SCALE 0.008",
+				":CHANNEL{}:OFFSET 0.0",
 			":CH{}:COUPLING DC"
 		    ]
 		}

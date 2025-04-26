@@ -1,10 +1,8 @@
 import time
 import json
-import LoggingConfiguration
+from logs import LoggingConfiguration
 import logging
 from instruments.Oscilloscopes import RIGOL
-from instruments.PolarizationControllers import OzOptics
-from optimizers.Optimizers import PSO
 
 CONFIG_FILE = "../CONFIG.json"
 
@@ -28,22 +26,11 @@ def scope_configuration(brand= "RIGOL", auto_set= False, source_channel= 1):
     return scope
 
 
-def p_controller_configuration(brand= "OzOptics"):
-    p_controller = OzOptics(CONFIGS)
-    p_controller.connect()
-    return p_controller
-
-
 acquirer = scope_configuration()
 
 
-for i in range(3):
-    try:
-        acquirer.update_data(additional_data= [None, None, None, None], source_channel= 1)
-        acquirer.isualise(acquirer.scaled_data)
-        acquirer.visualise(acquirer.smoothed_data)
-        acquirer.visualise(acquirer.cleaned_data)
-        print("type one wave: ", acquirer.discriminator(s_channel= 1))
-        time.sleep(10)
-    except:
-        print("something went Wrong!")
+acquirer.update_data(additional_data= [None, None, None, None], source_channel= 1)
+acquirer.visualise(acquirer.scaled_data)
+acquirer.visualise(acquirer.smoothed_data)
+acquirer.visualise(acquirer.cleaned_data)
+print("type one wave: ", acquirer.discriminator(s_channel= 1))
