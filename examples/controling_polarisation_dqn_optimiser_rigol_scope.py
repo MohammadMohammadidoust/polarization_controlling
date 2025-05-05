@@ -69,14 +69,14 @@ while True:
         #    print("type one wave: ", acquirer.discriminator(s_channel= 1))
         #    acquirer.visualise(acquirer.smoothed_data)
         print("Live QBER: ", acquirer.qber)
-        if 0.075 < acquirer.qber:
+        if 0.12 < acquirer.qber:
             print("start running optimiser")
-            time.sleep(0.3)
+            time.sleep(0.4)
             optimizer.run()
-        time.sleep(0.2)
+        time.sleep(0.4)
         counter += 1
         if counter % 100 == 0:
             #acquirer.visualise(acquirer.cleaned_data)
-            acquirer.extract_results("dqn_first.csv")
+            acquirer.extract_results("dddqn_first_10km.csv")
     except KeyboardInterrupt:
         logger.info("the programme has been finished")

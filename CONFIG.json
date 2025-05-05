@@ -146,7 +146,7 @@
 	}	    
     },
     "optimizer": {
-	"qber_threshold": 0.09,
+	"qber_threshold": 0.1,
 	"pso": {
 	    "learning_mode": "cumulative_learning",
 	    "min_x": -5000,
@@ -172,7 +172,7 @@
 	    "high": 5001
 	},
 	"dqn": {
-	    "model_type": "VanillaDQN",
+	    "model_type": "DoubleDuelingDQN",
 	    "Comment": "implemented types: VanillaDQN, DoubleDQN, DuelingDQN, DoubleDuelingDQN",
 	    "total_runs": 300,
 	    "input_dims": 1,
@@ -189,8 +189,8 @@
 	    "epsilon_dec": 0.996,
 	    "epsilon_end": 0.001,
 	    "batch_size": 64,
-	    "fname": "dqn_model.h5",
-	    "fname2": "double_dqn_target_model.h5",
+	    "fname": "dddqn_model.h5",
+	    "fname2": "dddqn_target_model.h5",
 	    "replace_target": 100,
 	    "all_actions": {
 		"0": "ZZZZ",
@@ -297,7 +297,7 @@
 	    "baudrate": 115200,
 	    "timeout": 1,
 	    "initial_state": [1000, 1000, 1000, 1000],
-	    "step_size": 150,
+	    "step_size": 200,
 	    "min_voltage": -5000,
 	    "max_voltage": 5000
 	}

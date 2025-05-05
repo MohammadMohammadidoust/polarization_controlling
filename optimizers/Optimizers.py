@@ -66,6 +66,7 @@ class PSO(object):
                 current_position = self.position_x[iteration, particle_no, :]
                 current_voltage = current_position.astype(int).tolist()
                 self.p_controller.send_voltages(current_voltage)
+                print("insdie qber: ", self.p_data_acquisition.qber)
                 time.sleep(0.4)
                 self.p_data_acquisition.update_data(current_voltage)
                 current_qber = self.p_data_acquisition.qber
@@ -200,6 +201,7 @@ class DQN():
             observation_, reward, done= self.env.step(action)
             score += reward
             print("score: ", score)
+            print("inside QBER: ", self.env.p_data_acquisition.qber)
             self.agent.remember(observation, action, reward, observation_, int(done))
             observation = observation_
             self.agent.learn()

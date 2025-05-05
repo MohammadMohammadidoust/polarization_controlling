@@ -69,10 +69,10 @@ class Environment():
         
         if boundry_condition:
             logger.debug("Hit the voltage extermom")
-            return (-2000, True)                             #reward and done status
+            return (-200, True)                             #reward and done status
         if self.p_data_acquisition.qber < self.terminal_condition:
             logger.debug("Successfull polarisation restoration")
-            return (10.0, True)
+            return (200.0, True)
         return (-2*(self.p_data_acquisition.qber - self.terminal_condition), False)
 
     def check_boundry_conditions(self, action):
@@ -93,7 +93,7 @@ class Environment():
             acts = self.translate_actions(action)
             new_voltages = self.p_controller.action_to_voltages(acts)
             self.p_controller.send_voltages(new_voltages)
-            time.sleep(0.3)         #response time
+            time.sleep(0.4)         #response time
             self.p_data_acquisition.update_data(new_voltages)
             reward, done= self.calculate_reward(boundry_condition= False)
             return (np.array([self.p_data_acquisition.qber]), reward, done)
