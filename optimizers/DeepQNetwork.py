@@ -69,7 +69,8 @@ class Environment():
         
         if boundry_condition:
             logger.debug("Hit the voltage extermom")
-            return (-200, True)                             #reward and done status
+            reward = -10 + (-2*(self.p_data_acquisition.qber - self.terminal_condition))
+            return (reward, False)                             #reward and done status
         if self.p_data_acquisition.qber < self.terminal_condition:
             logger.debug("Successfull polarisation restoration")
             return (200.0, True)
@@ -87,16 +88,21 @@ class Environment():
         boundry = self.check_boundry_conditions(action)
         if boundry:
             reward, done= self.calculate_reward(boundry_condition= True)
-            self.p_controller.reset_voltages()
-            return (self.p_data_acquisition.qber, reward, done)
+            #self.p_controller.reset_voltages()
+            selself.p_data_acquisition.update_data([None, None, None, None])
+            state = np.append(self.p_controller.current_voltages.copy(),
+                              [self.p_data_acquisition.qber])
+            return (state, reward, done)
         else:
             acts = self.translate_actions(action)
             new_voltages = self.p_controller.action_to_voltages(acts)
             self.p_controller.send_voltages(new_voltages)
             time.sleep(0.4)         #response time
             self.p_data_acquisition.update_data(new_voltages)
+            state = np.append(self.p_controller.current_voltages.copy(),
+                              [self.p_data_acquisition.qber])
             reward, done= self.calculate_reward(boundry_condition= False)
-            return (np.array([self.p_data_acquisition.qber]), reward, done)
+            return (state, reward, done)
 
 class ReplayBuffer(object):
     def __init__(self, max_size, input_shape, n_actions, discrete= False):

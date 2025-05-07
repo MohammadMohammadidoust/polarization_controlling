@@ -21,7 +21,7 @@ In many quantum cryptography protocols (e.g., the polarization-based BB84 protoc
   Once the QBER exceeds a predefined threshold, the system calculates and applies optimal voltage adjustments to the fiber via a polarization controller.
 
 - **Advanced Optimization Algorithms:**  
-  Integrated optimizers such as Particle Swarm Optimization (PSO) and Simulated Annealing (SA) reduce correction times and maintain system stability.
+  Integrated optimizers such as Particle Swarm Optimization (PSO), Simulated Annealing (SA) and some Reinforcement Learning techniques like DeepQNetwork (DQN) reduce correction times and maintain system stability.
 
 - **Modular and Extensible:**  
   Designed with flexibility in mind, the APIs can easily accommodate new instruments or optimization methods, making them useful beyond polarization control applications.
@@ -96,7 +96,7 @@ Please review our CONTRIBUTING.md for detailed contribution guidelines and best 
 ---
 
 ## Publications and citation
-This work has led to this ![paper](publications/Active_polarization_controlling.pdf) and is being used in our current projects. In case of scientific usage, please cite our main article : [Asgari, Hamid & Khodabandeh, Majid & Hajibaba, Soheil & Dadahkhani, Amir & Madani, Seyed. (2024). Active polarization controlling in optical fiber links using optimization algorithms. Indian Journal of Physics. 99. 1-8. 10.1007/s12648-024-03342-w. ](https://www.researchgate.net/publication/382523272_Active_polarization_controlling_in_optical_fiber_links_using_optimization_algorithms)
+This work has led to this [paper](publications/Active_polarization_controlling.pdf) and is being used in our current projects. In case of scientific usage, please cite our main article : [Asgari, Hamid & Khodabandeh, Majid & Hajibaba, Soheil & Dadahkhani, Amir & Madani, Seyed. (2024). Active polarization controlling in optical fiber links using optimization algorithms. Indian Journal of Physics. 99. 1-8. 10.1007/s12648-024-03342-w. ](https://www.researchgate.net/publication/382523272_Active_polarization_controlling_in_optical_fiber_links_using_optimization_algorithms)
 
 ## References
 
