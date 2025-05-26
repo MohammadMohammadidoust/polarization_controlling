@@ -2,17 +2,23 @@ import logging
 import numpy as np
 import time
 import os
+
+from keras.src.utils.module_utils import tensorflow
+
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
-from keras.layers import Dense, Activation
-from keras.models import Sequential, load_model
-from keras.optimizers import Adam
-import tensorflow as tf
-import tensorflow.keras as keras
+#import tensorflow as tflow
+from tensorflow.keras.layers import Dense, Activation, Input, Lambda
+from tensorflow.keras.models import Sequential, load_model, Model
 from tensorflow.keras.optimizers import Adam
 
 
 
 logger = logging.getLogger(__name__)
+
+@tensorflow.keras.utils.register_keras_serializable()
+def combine_streams(inputs):
+    v, a = inputs
+    return v + (a - tensorflow.reduce_mean(a, axis=1, keepdims=True))
 
 def build_dqn(lr, n_actions, input_dims, fc1_dims, fc2_dims):
     model = Sequential([
@@ -25,9 +31,8 @@ def build_dqn(lr, n_actions, input_dims, fc1_dims, fc2_dims):
     return model
 
 
-def build_dueling_dqn(lr, n_actions, input_dims, fc1_dims, fc2_dims, fcvalue_dims,
-                      fcadvantage_dims):
-    input_layer = keras.layers.Input(shape=(input_dims,))
+def build_dueling_dqn(lr, n_actions, input_dims, fc1_dims, fc2_dims, fcvalue_dims, fcadvantage_dims):
+    input_layer = Input(shape=(input_dims,))
     dense1 = Dense(fc1_dims, activation='relu')(input_layer)
     dense2 = Dense(fc2_dims, activation='relu')(dense1)
     value_fc = Dense(fcvalue_dims, activation='relu')(dense2)
@@ -35,13 +40,8 @@ def build_dueling_dqn(lr, n_actions, input_dims, fc1_dims, fc2_dims, fcvalue_dim
     advantage_fc = Dense(fcadvantage_dims, activation='relu')(dense2)
     advantage = Dense(n_actions, activation=None)(advantage_fc)
 
-    def combine_streams(inputs):
-        v, a = inputs
-        return v + (a - tf.reduce_mean(a, axis=1, keepdims=True))
-
-    q_values = keras.layers.Lambda(combine_streams)([value, advantage])
-    
-    model = keras.Model(inputs=input_layer, outputs=q_values)
+    q_values = Lambda(combine_streams)([value, advantage])
+    model = Model(inputs=input_layer, outputs=q_values)
     model.compile(optimizer=Adam(learning_rate=lr), loss='mse')
     return model
 
@@ -58,38 +58,57 @@ class Environment():
         action_string= self.all_actions[action_index]
         return list(action_string)
 
-    def calculate_reward(self, boundry_condition):
+    def calculate_reward(self, boundary_condition):
         """
         Reward system is designed based on distance between current state and
         our expected state. I will punish agent in each step based on this
         distance and if agent finds expected state it gives a +10 points reward
-        if agent tries to cross voltage treshold, it'll give a -2000 punish
+        if agent tries to cross voltage threshold, it'll give a -10 point punish
+        and if all voltages cross the thresholds, the episode will be finished.
 
         """
-        
-        if boundry_condition:
-            logger.debug("Hit the voltage extermom")
-            reward = -10 + (-2*(self.p_data_acquisition.qber - self.terminal_condition))
-            return (reward, False)                             #reward and done status
-        if self.p_data_acquisition.qber < self.terminal_condition:
-            logger.debug("Successfull polarisation restoration")
-            return (200.0, True)
-        return (-2*(self.p_data_acquisition.qber - self.terminal_condition), False)
 
-    def check_boundry_conditions(self, action):
+        if self.p_data_acquisition.qber < self.terminal_condition:
+            logger.debug("Successful polarisation restoration")
+            return 200.0, True
+        if boundary_condition == 1:
+            logger.debug("Hit the voltage boundaries")
+            reward = -10 + (-2*(self.p_data_acquisition.qber - self.terminal_condition))
+            return reward, False
+        if boundary_condition == 2:
+            logger.debug("Hit ALL voltage boundaries")
+            reward = -30 + (-2*(self.p_data_acquisition.qber - self.terminal_condition))
+            return reward, True
+        return -2 * (self.p_data_acquisition.qber - self.terminal_condition), False
+
+    def check_boundary_conditions(self, action):
+        """
+        function to check whether the action hits boundary conditions
+        :return: three statuses: 0 means no boundaries are hit
+        1 means at least one voltage and at most 3 voltage hit the boundary
+        2 means all voltages hit the boundary
+        """
         acts = self.translate_actions(action)
-        return any(
+        if any(
             (volt >= self.p_controller.max_voltage and act != 'D') or
             (volt <= self.p_controller.min_voltage and act != 'U')
             for volt, act in zip(self.p_controller.current_voltages, acts)
-            )
+            ):
+            if all(
+                (volt >= self.p_controller.max_voltage and act != 'D') or
+                (volt <= self.p_controller.min_voltage and act != 'U')
+                for volt, act in zip(self.p_controller.current_voltages, acts)
+                ):
+                return 2
+            return 1
+        return 0
 
     def step(self, action):
-        boundry = self.check_boundry_conditions(action)
-        if boundry:
-            reward, done= self.calculate_reward(boundry_condition= True)
-            #self.p_controller.reset_voltages()
-            selself.p_data_acquisition.update_data([None, None, None, None])
+        boundary = self.check_boundary_conditions(action)
+        if boundary == 2:
+            reward, done= self.calculate_reward(boundary_condition= 2)
+            self.p_controller.reset_voltages()
+            self.p_data_acquisition.update_data([0, 0, 0, 0])
             state = np.append(self.p_controller.current_voltages.copy(),
                               [self.p_data_acquisition.qber])
             return (state, reward, done)
@@ -101,8 +120,8 @@ class Environment():
             self.p_data_acquisition.update_data(new_voltages)
             state = np.append(self.p_controller.current_voltages.copy(),
                               [self.p_data_acquisition.qber])
-            reward, done= self.calculate_reward(boundry_condition= False)
-            return (state, reward, done)
+            reward, done= self.calculate_reward(boundary_condition= boundary)
+            return state, reward, done
 
 class ReplayBuffer(object):
     def __init__(self, max_size, input_shape, n_actions, discrete= False):
@@ -163,6 +182,7 @@ class Agent(object):
         self.model_file = fname
         self.target_model_file = fname2
         self.memory = ReplayBuffer(mem_size, input_dims, n_actions, discrete)
+        self.l_rate = alpha
         if model_type in ["VanillaDQN", "DoubleDQN"]:
             self.q_eval = build_dqn(alpha, n_actions, input_dims, fc1_dims, fc2_dims)
             self.q_target = build_dqn(alpha, n_actions, input_dims, fc1_dims, fc2_dims)
@@ -229,17 +249,18 @@ class Agent(object):
             self.q_target.save(self.target_model_file)
             logger.info(f"Target Model has been saved successfully in file: {self.target_model_file}")
 
-    def load_model(self):
+    def load_model(self, file_name):
         try:
-            self.q_eval = load_model(self.model_file)
-            logger.info(f"Evaluation Model has been loaded successfully from file: {self.model_file}")
+            self.q_eval = load_model(file_name, compile= False)
+            self.q_eval.compile(optimizer=Adam(learning_rate= self.l_rate), loss='mse')
+            logger.info(f"Evaluation Model has been loaded successfully from file: {file_name}")
+            print(f"Evaluation Model has been loaded successfully from file: {file_name}")
             if self.model_type in ["DoubleDQN", "DoubleDuelingDQN"]:
                 try:
-                    self.q_target = load_model(self.target_model_file)
-                    logger.info(f"Target Model has been loaded successfully from file: {self.target_model_file}")
+                    self.update_target_network()
+                    print(f"Target Model has been loaded successfully updated")
                 except:
-                    logger.critical("Can not load Target Model! try again or start a new learning journey")
-                    raise RuntimeError("Load model failed. Try again or Start without loading!")
+                    logger.critical("Can not update Target Model! try again or start a new learning journey")
         except:
             logger.critical("Can not load Evaluation Model! try again or start a new learning journey")
             raise RuntimeError("Load model failed. Try again or Start without loading!")

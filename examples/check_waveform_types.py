@@ -22,7 +22,7 @@ def scope_configuration(brand= "RIGOL", auto_set= False, source_channel= 1):
         print("auto set is done!")
     print("wait for initialisation!")
     scope.initialise()
-    time.sleep(5)
+    time.sleep(4)
     return scope
 
 

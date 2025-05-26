@@ -70,7 +70,7 @@ while True:
         #    print("type one wave: ", acquirer.discriminator(s_channel= 1))
         #    acquirer.visualise(acquirer.smoothed_data)
         print("Live QBER: ", acquirer.qber)
-        if 0.095 < acquirer.qber:
+        if 0.06 < acquirer.qber:
             print("start running optimiser")
             time.sleep(0.3)
             optimizer.run()
@@ -78,6 +78,6 @@ while True:
         counter += 1
         if counter % 100 == 0:
             #acquirer.visualise(acquirer.cleaned_data)
-            acquirer.extract_results("pso_first_test_10km.csv")
+            acquirer.extract_results("pso_test_20km.csv")
     except KeyboardInterrupt:
         logger.info("the programme has been finished")

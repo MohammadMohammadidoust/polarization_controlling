@@ -66,7 +66,7 @@ class PSO(object):
                 current_position = self.position_x[iteration, particle_no, :]
                 current_voltage = current_position.astype(int).tolist()
                 self.p_controller.send_voltages(current_voltage)
-                print("insdie qber: ", self.p_data_acquisition.qber)
+                #print("insdie qber: ", self.p_data_acquisition.qber)
                 time.sleep(0.4)
                 self.p_data_acquisition.update_data(current_voltage)
                 current_qber = self.p_data_acquisition.qber
@@ -192,7 +192,7 @@ class DQN():
 
     def run(self):
         self.env.p_data_acquisition.update_data(self.env.p_controller.current_voltages)
-        observation = self.env.p_data_acquisition.qber
+        observation = np.append(self.env.p_controller.current_voltages, self.env.p_data_acquisition.qber)
         done = False
         score = 0
         while not done:
@@ -207,11 +207,11 @@ class DQN():
             self.agent.learn()
         self.scores.append(score)
         self.episode += 1
-        if self.episode % 50 == 0:
+        if self.episode % 10 == 0:
             avg_score = np.mean(self.scores[max(0, self.episode - 100):(self.episode + 1)])
             logging.info(f"Episode: {self.episode} Average Scores: {avg_score}")
             self.agent.save_model()
             
-    def load_model(self):
-        self.agent.load_model()
+    def load_model(self, model_name):
+        self.agent.load_model(model_name)
     

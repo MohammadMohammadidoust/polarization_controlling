@@ -186,8 +186,8 @@ class OWON:
 
     def extract_period_index_v4(self, wave_form):
         logger.debug("Start extracting period from a waveform")
-        zero_buffer = 0.001
-        signal_buffer = self.wave_amplitude/5
+        zero_buffer = 0.0007
+        signal_buffer = self.wave_amplitude/6
         try: 
             first_zero_index = next((i for i, point in enumerate(wave_form) if point <= zero_buffer), None)
             first_signal_index = next((i for i, point in enumerate(wave_form[first_zero_index:],
@@ -416,7 +416,7 @@ class RIGOL:
     def extract_period_index_v4(self, s_channel):
         self.smoother()
         zero_buffer = 0.0001
-        signal_buffer = 0.001
+        signal_buffer = 0.0008
         first_zero_index = next((i for i, point in enumerate(self.smoothed_data[s_channel]) if point <= zero_buffer), None)
         try:
             first_signal_index = next((i for i, point in enumerate(self.smoothed_data[s_channel][first_zero_index:],
@@ -438,16 +438,21 @@ class RIGOL:
         self.cleaned_data['time_data'] = np.array(self.cleaned_data['time_data']) - time_shift
 
     def discriminator(self, s_channel):
-        type_one_wave = False
+        type_one_wave = True
+        zero_buffer = 0.00095
         wave_size = len(self.cleaned_data[s_channel])
-        check_point1 = int(wave_size * (self.pduty1 + (self.nduty1 / 2)))
-        check_point2 = int(wave_size * (self.pduty1 + self.nduty1 + self.pduty2 + (self.nduty2 / 2)))
-        first_assumed_gap = np.average(self.cleaned_data[s_channel][check_point1 -5 : check_point1 + 5])
-        second_assumed_gap = np.average(self.cleaned_data[s_channel][check_point2 -5 : check_point2 + 5])
-        # 0.3 is an assumed value that seems to be worked!
-        if (np.abs(first_assumed_gap) / np.abs(second_assumed_gap)) > 0.3:
-            type_one_wave = True
+        ref_point = int(wave_size * (self.pduty1 + 2 * self.nduty1))
+        #check_point1 = int(wave_size * (self.pduty1 + (self.nduty1 / 2)))
+        #check_point2 = int(wave_size * (self.pduty1 + self.nduty1 + self.pduty2 + (self.nduty2 / 2)))
+        #first_assumed_gap = np.average(self.cleaned_data[s_channel][check_point1 -2 : check_point1 + 2])
+        #second_assumed_gap = np.average(self.cleaned_data[s_channel][check_point2 -2 : check_point2 + 2])
+        ref_value = np.average(self.cleaned_data[s_channel][ref_point -1 : ref_point + 2])
+        #if (np.abs(first_assumed_gap) / np.abs(second_assumed_gap)) > 0.8:
+        #    type_one_wave = True
+        if ref_value <= zero_buffer:
+            type_one_wave = False
         return type_one_wave
+
     def qber_calculator(self, wave_type_one):
         self.unix_time = time.time()
         hv_qber_holder = self.hv_qber

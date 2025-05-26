@@ -28,7 +28,10 @@ class OzOptics(object):
             raise RuntimeError("Failed to connect OzOptics") 
 
     def update_voltages(self, volts: list[int] | np.ndarray) -> None:
-        self.current_voltages = volts
+        for i, volt in enumerate(volts):
+            if volt < self.min_voltage or volt > self.max_voltage:
+                self.current_voltages[i] = self.current_voltages[i]
+            self.current_voltages[i] = volt
 
     def send_voltages(self, volts: list[int] | np.ndarray) -> None:
         self.update_voltages(volts)

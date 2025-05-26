@@ -132,7 +132,7 @@
 		    ],
 		    "channel": [
 			":CHANNEL{}:DISP ON",
-			":CHANNEL{}:SCALE 0.008",
+			":CHANNEL{}:SCALE 0.002",
 				":CHANNEL{}:OFFSET 0.0",
 			":CH{}:COUPLING DC"
 		    ]
@@ -146,7 +146,7 @@
 	}	    
     },
     "optimizer": {
-	"qber_threshold": 0.1,
+	"qber_threshold": 0.09,
 	"pso": {
 	    "learning_mode": "cumulative_learning",
 	    "min_x": -5000,
@@ -186,7 +186,7 @@
 	    "fcadvantage_dims": 128,
 	    "gamma": 0.99,
 	    "epsilon": 0.5,
-	    "epsilon_dec": 0.996,
+	    "epsilon_dec": 0.997,
 	    "epsilon_end": 0.001,
 	    "batch_size": 64,
 	    "fname": "dddqn_model.h5",
@@ -297,7 +297,7 @@
 	    "baudrate": 115200,
 	    "timeout": 1,
 	    "initial_state": [1000, 1000, 1000, 1000],
-	    "step_size": 200,
+	    "step_size": 175,
 	    "min_voltage": -5000,
 	    "max_voltage": 5000
 	}

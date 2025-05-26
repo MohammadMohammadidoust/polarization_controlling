@@ -49,5 +49,3 @@ for instrument_type, brand in INSTALLED_INSTRUMENTS.items():
             print(e)
     else:
         print(f"No configuration function defined for {instrument_type}")
-
-
